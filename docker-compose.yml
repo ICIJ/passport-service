@@ -116,7 +116,7 @@ services:
         condition: service_started
     build:
       context: .
-      target: inference-worker
+      target: inference-worker-cpu
     environment:
       <<: [ *worker-config, *async-app ]
     volumes:
