@@ -1,0 +1,7 @@
+*
+!passport_service
+passport_service/tests
+!uv.lock
+!pyproject.toml
+!README.md
+!scripts

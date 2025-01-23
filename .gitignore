@@ -1,0 +1,29 @@
+# Java
+target/
+out/
+dependency-reduced-pom.xml
+.idea/
+*.iml
+dist/
+logs/
+/app
+pom.xml.versionsBackup
+*.code-workspace
+
+# Python
+*.log
+venv
+*.egg-info
+.eggs
+__pycache__
+*.pytest_cache
+*.pyc
+build
+dist
+test/.env
+.cache
+tmp
+./*.csv
+
+# VS code
+.vscode

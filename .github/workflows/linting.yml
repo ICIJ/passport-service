@@ -1,0 +1,19 @@
+name: Linting test for passport-service
+
+on:
+  push:
+    branches: [ 'main' ]
+  pull_request:
+
+jobs:
+  linting-test-passport-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/ruff-action@v3
+        with:
+          args: check -v --config qa/ruff.toml --no-fix
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true

@@ -1,0 +1,87 @@
+[project]
+name = "passport-service"
+version = "0.6.11"
+description = "Passport detection service"
+authors = [
+    { name = "Clément Doumouro", email = "cdoumouro@icij.org" },
+]
+readme = "README.md"
+requires-python = "~=3.10"
+dependencies = [
+    "aiostream~=0.6.1",
+    "aiohttp~=3.10.10",
+    "icij-worker[amqp]~=0.13.7",
+    "aio-pika==9.4.2",
+    "aiormq==6.8.0",
+    "fastapi>=0.111.1",
+]
+
+[tool.setuptools]
+packages = ["passport_service"]
+
+[project.urls]
+Homepage = "https://github.com/ICIJ/passport-service"
+Repository = "https://github.com/ICIJ/passport-service"
+Issues = "https://github.com/ICIJ/passport-service/issues"
+
+[project.optional-dependencies]
+http = [
+    "fastapi~=0.111.1",
+    "gunicorn~=22.0.0"
+]
+inference = [
+    "numpy~=1.26.4",
+    "opencv-python~=4.10.0.84",
+    "passporteye~=2.2.1",
+    "pillow~=9.4.0",
+    "pycountry~=23.12.11",
+    "python-levenshtein~=0.23.0",
+    # TODO: to avoid this, we need to conditionnally bypass the gotemberg client creation and hence need to read the
+    # worker group in the deps workflow
+    "tenacity~=9.0.0",
+]
+gpu = [
+    "onnxruntime-gpu~=1.19.2",
+]
+cpu = [
+    "onnxruntime-gpu~=1.19.2",
+]
+preprocessing = [
+    "passporteye~=2.2.1",
+    "pillow~=9.4.0",
+    "pymupdf~=1.24.7",
+    "tenacity~=9.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "black~=24.4.2",
+    "pylint~=2.15.10",
+    "pytest~=8.2.2",
+    "pytest-asyncio~=0.21.1",
+]
+
+[tool.uv.sources]
+onnxruntime-gpu = [
+    { index = "onnx-nightly" },
+]
+onnxruntime = [
+    { index = "onnx-nightly" },
+]
+
+[[tool.uv.index]]
+name = "onnx-nightly"
+url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.commitizen]
+version_provider = "pep621"
+name = "cz_conventional_commits"
+tag_format = "v$version"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"

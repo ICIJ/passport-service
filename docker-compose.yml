@@ -1,0 +1,126 @@
+version: '3.7'
+
+x-worker-config-variables: &worker-config
+  ICIJ_WORKER_TYPE: amqp
+  ICIJ_WORKER_RABBITMQ_HOST: rabbitmq
+  ICIJ_WORKER_RABBITMQ_PORT: 5672
+
+x-tm-amqp-config-variables: &tm-amqp-config
+  PASSPORT_HTTP_TASK_MANAGER__RABBITMQ_HOST: rabbitmq
+  PASSPORT_HTTP_TASK_MANAGER__RABBITMQ_PORT: 5672
+
+x-async-app-variables: &async-app
+  PASSPORT_ASYNC_DATA_DIR: /usr/src/data
+  PASSPORT_ASYNC_WORK_DIR: /usr/src/data/workdir
+  PASSPORT_ASYNC_GOTENBERG_URL: "http://gotenberg:3000"
+  PASSPORT_ASYNC_LOG_LEVEL: DEBUG
+
+x-postgres-storage-config: &tm-postgres-storage-config
+  PASSPORT_HTTP_TASK_MANAGER__BACKEND: amqp
+  # Change this to a FSKeyValueStorageConfig if you don't want to use postgres
+  PASSPORT_HTTP_TASK_MANAGER__STORAGE__HOST: postgres
+  PASSPORT_HTTP_TASK_MANAGER__STORAGE__PORT: 5432
+  PASSPORT_HTTP_TASK_MANAGER__STORAGE__PASSWORD: changeme
+
+x-fs-storage-config: &tm-fs-storage-config
+                       ...
+
+services:
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: passport-service-test-gotenberg
+    healthcheck:
+      test: curl -f http://localhost:3000/health
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "3000:3000"
+
+  rabbitmq:
+    image: rabbitmq:3.12.0-management
+    container_name: passport-service-rabbit-mq
+    healthcheck:
+      test: rabbitmq-diagnostics -q status
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  postgres:
+    image: postgres
+    container_name: passport-service-postgres
+    environment:
+      POSTGRES_PASSWORD: changeme
+    healthcheck:
+      test: pg_isready
+      interval: 2s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "5435:5432"
+
+  service:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    build:
+      context: .
+      target: passport-service
+      args:
+        dbmate_arch: ${DBMATE_ARCH}
+    environment:
+      <<: [ *tm-amqp-config, *tm-postgres-storage-config ]
+      # If you don't want to use postgres use: <<: [*worker-config, *tm-fs-storage-config]
+      PASSPORT_HTTP_PORT: 8080
+
+    healthcheck:
+      test: curl -f http://localhost:8080/version # TODO: update this with the health/ping route
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "8080:8080"
+
+  preprocessing-worker:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      gotenberg:
+        condition: service_healthy
+      service:
+        condition: service_healthy
+    build:
+      context: .
+      target: preprocessing-worker
+    environment:
+      <<: [ *worker-config, *async-app ]
+    volumes:
+      - type: bind
+        source: ./data
+        target: /usr/src/data
+
+  inference-worker:
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      service:
+        condition: service_started
+    build:
+      context: .
+      target: inference-worker
+    environment:
+      <<: [ *worker-config, *async-app ]
+    volumes:
+      - type: bind
+        source: ./data
+        target: /usr/src/data
+

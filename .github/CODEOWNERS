@@ -1,0 +1,6 @@
+.github @ICIJ/developers
+.gitea @ICIJ/developers
+.actions @ICIJ/developers
+.dockerignore @ICIJ/developers
+Dockerfile @ICIJ/developers
+passport-service @ICIJ/developers

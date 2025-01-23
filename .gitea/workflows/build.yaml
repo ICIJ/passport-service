@@ -1,0 +1,129 @@
+---
+name: Publish Docker images
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  CD_WEBHOOK: "${{ secrets.CD_WEBHOOK }}"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure SSH to be able to log in the target instances
+        run: |
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          dos2unix ~/.ssh/deploy_key
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add ~/.ssh/deploy_key
+
+      - name: Checkout code
+        uses: https://github.com/actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Login to Docker Registry
+        uses: https://github.com/docker/login-action@v2
+        with:
+          registry: ${{ secrets.REGISTRY_NAME }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Set up QEMU
+        uses: https://github.com/docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: https://github.com/docker/setup-buildx-action@v2
+
+      - name: Determine DBMate architecture
+        id: arch
+        run: |
+          DBMATE_ARCH=$(arch || uname -m)
+          if [[ "$DBMATE_ARCH" == "x86_64" || "$DBMATE_ARCH" == "amd64" ]]; then
+            DBMATE_ARCH="amd64"
+          elif [[ "$DBMATE_ARCH" == "aarch64" || "$DBMATE_ARCH" == "arm64" ]]; then
+            DBMATE_ARCH="arm64"
+          elif [[ "$DBMATE_ARCH" == "i386" ]]; then
+            DBMATE_ARCH="386"
+          else
+            echo "Unsupported architecture: $DBMATE_ARCH" >&2
+            exit 1
+          fi
+          echo "DBMATE_ARCH=$DBMATE_ARCH" >> $GITHUB_ENV
+
+      # Metadata for passportservice
+      - name: Extract metadata for passportservice
+        id: meta-passportservice
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ secrets.REGISTRY_NAME }}/passportservice
+
+      # Metadata for preprocessing-worker
+      - name: Extract metadata for preprocessing-worker
+        id: meta-preprocessing-worker
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ secrets.REGISTRY_NAME }}/preprocessing-worker
+
+      # Metadata for inference-worker
+      - name: Extract metadata for inference-worker
+        id: meta-inference-worker
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ secrets.REGISTRY_NAME }}/inference-worker
+
+      - name: Build and push passportservice
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          target: passport-service
+          platforms: linux/amd64
+          push: true
+          cache-from: type=registry,ref=${{ secrets.REGISTRY_NAME }}/passportservice:buildcache
+          cache-to: type=registry,ref=${{ secrets.REGISTRY_NAME }}/passportservice:buildcache,mode=max
+          tags: ${{ steps.meta-passportservice.outputs.tags }}
+          labels: ${{ steps.meta-passportservice.outputs.labels }}
+          build-args: |
+            dbmate_arch=${{ env.DBMATE_ARCH }}
+
+      - name: Build and push preprocessing-worker
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          target: preprocessing-worker
+          platforms: linux/amd64
+          push: true
+          cache-from: type=registry,ref=${{ secrets.REGISTRY_NAME }}/preprocessing-worker:buildcache
+          cache-to: type=registry,ref=${{ secrets.REGISTRY_NAME }}/preprocessing-worker:buildcache,mode=max
+          tags: ${{ steps.meta-preprocessing-worker.outputs.tags }}
+          labels: ${{ steps.meta-preprocessing-worker.outputs.labels }}
+          build-args: |
+            dbmate_arch=${{ env.DBMATE_ARCH }}
+
+      - name: Build and push inference-worker
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          target: inference-worker
+          platforms: linux/amd64
+          push: true
+          cache-from: type=registry,ref=${{ secrets.REGISTRY_NAME }}/inference-worker:buildcache
+          cache-to: type=registry,ref=${{ secrets.REGISTRY_NAME }}/inference-worker:buildcache,mode=max
+          tags: ${{ steps.meta-inference-worker.outputs.tags }}
+          labels: ${{ steps.meta-inference-worker.outputs.labels }}
+          build-args: |
+            dbmate_arch=${{ env.DBMATE_ARCH }}
+
+      - name: Notify failures
+        if: failure()
+        run: |-
+          ./.actions/base/notify.sh bangbang "@$GITHUB_ACTOR" "[Error running the build on the Docker images]"
+
+      - name: Notify success
+        run: |-
+          ./.actions/base/notify.sh white_check_mark "@$GITHUB_ACTOR" "[Success running the build on the Docker images]"

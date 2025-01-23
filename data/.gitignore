@@ -1,0 +1,4 @@
+*
+!.gitignore
+!passports/.gitignore
+!workdir/.gitignore

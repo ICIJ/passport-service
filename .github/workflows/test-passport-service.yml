@@ -1,0 +1,83 @@
+name: Test for passport-service
+
+on:
+  push:
+    branches: [ 'main' ]
+  pull_request:
+
+jobs:
+  test-passport-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download test data
+        env:
+          TEST_DATA_REPO: ${{ secrets.GH_TEST_DATA_REPO }}
+          TEST_DATA_TOKEN: ${{ secrets.GH_TEST_DATA_TOKEN }}
+          BASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo $TEST_DATA_TOKEN | gh auth login --with-token
+          gh release download -R $TEST_DATA_REPO v0.1.0 -p 'test_model_v0.onnx' -D tests/data/models
+          echo $BASE_TOKEN | gh auth login --with-token
+      - name: Install Linux packages
+        run: |
+          sudo add-apt-repository ppa:alex-p/tesseract-ocr5
+          sudo apt update
+          sudo apt install tesseract-ocr
+          curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/download/v2.19.0/dbmate-linux-amd64
+          chmod +x /usr/local/bin/dbmate
+      - uses: astral-sh/ruff-action@v3
+        with:
+          args: format --check --config qa/ruff.toml
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.5"
+          python-version: "3.10"
+          enable-cache: true
+      - name: Setup Python project
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Run tests
+        run: uv run --dev --all-extras --frozen pytest -vvv --cache-clear --show-capture=all -r A tests
+    services:
+      gotenberg:
+        image: gotenberg/gotenberg:8
+        options: >-
+          --health-cmd "curl -f http://localhost:3000/health"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 10
+          --health-start-period 20s
+        ports:
+          - 3000:3000
+
+      rabbit-mq:
+        image: rabbitmq:3.12.0-management
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 10
+          --health-start-period 20s
+        ports:
+          - 5672:5672
+          - 15672:15672
+
+      test-postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: changeme
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 10
+          --health-start-period 5s
+        ports:
+          - "5435:5432"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
