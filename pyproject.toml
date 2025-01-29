@@ -10,7 +10,7 @@ requires-python = "~=3.10"
 dependencies = [
     "aiostream~=0.6.1",
     "aiohttp~=3.10.10",
-    "icij-worker[amqp]~=0.13.7",
+    "icij-worker[amqp]~=0.14.1",
     "aio-pika==9.4.2",
     "aiormq==6.8.0",
     "fastapi>=0.111.1",
@@ -41,10 +41,10 @@ inference = [
     "tenacity~=9.0.0",
 ]
 gpu = [
-    "onnxruntime-gpu~=1.19.2",
+    "onnxruntime-gpu==1.19.2",
 ]
 cpu = [
-    "onnxruntime-gpu~=1.19.2",
+    "onnxruntime==1.19.2",
 ]
 preprocessing = [
     "passporteye~=2.2.1",
@@ -64,14 +64,17 @@ dev = [
 [tool.uv.sources]
 onnxruntime-gpu = [
     { index = "onnx-nightly" },
+
 ]
-onnxruntime = [
-    { index = "onnx-nightly" },
-]
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/"
 
 [[tool.uv.index]]
 name = "onnx-nightly"
 url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/"
+explicit = true
 
 [build-system]
 requires = ["setuptools"]
