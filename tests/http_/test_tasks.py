@@ -54,7 +54,6 @@ async def test_get_task(test_client: TestClient, monkeypatch) -> None:  # noqa: 
     assert res.status_code == 200, res.json()
     expected_task = {
         "args": dict(),
-        "cancelledAt": None,
         "completedAt": None,
         "createdAt": task.created_at.isoformat(),
         "id": "some_task",
