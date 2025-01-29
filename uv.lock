@@ -644,16 +644,16 @@ wheels = [
 
 [[package]]
 name = "icij-worker"
-version = "0.14.1"
+version = "0.14.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "icij-common" },
     { name = "typer" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/fc/f2890aa325b1dd64796e283525771edf89329107eaba90b8f2b68f7d51f0/icij_worker-0.14.1.tar.gz", hash = "sha256:e0901082ae1af6d55702c63a7c707ebf22d832aa9bc062b9f4e1cded9e790636", size = 57701 }
+sdist = { url = "https://files.pythonhosted.org/packages/76/0b/49471912dd8eb35b10a83ab4c2dae8578c7d9347ef3d1915b5cfdc8459c7/icij_worker-0.14.2.tar.gz", hash = "sha256:329180b60781aeccabfcce24220b44ad7c419f67aca27ed651166c3ee9759097", size = 57785 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/2b/cdbc21e4f62dc3b3010a622d5994bcce70573927d2f762affa6813a6ca00/icij_worker-0.14.1-py3-none-any.whl", hash = "sha256:b7d046b740c006596c7aef45db5c9cc43950bda0eab6c49c0a7ba1fa91e43b15", size = 79333 },
+    { url = "https://files.pythonhosted.org/packages/bd/a8/eaf43757390c3d2f610582716506f726a146ba7abf2ec97b20500fa8dbf7/icij_worker-0.14.2-py3-none-any.whl", hash = "sha256:a2347006353e35b2e62bd43c10c06d42796f06e5d859258b677a5a992913fbf2", size = 79409 },
 ]
 
 [package.optional-dependencies]
@@ -1273,7 +1273,7 @@ wheels = [
 
 [[package]]
 name = "passport-service"
-version = "0.6.13"
+version = "0.6.15"
 source = { editable = "." }
 dependencies = [
     { name = "aio-pika" },
@@ -1328,7 +1328,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.111.1" },
     { name = "fastapi", marker = "extra == 'http'", specifier = "~=0.111.1" },
     { name = "gunicorn", marker = "extra == 'http'", specifier = "~=22.0.0" },
-    { name = "icij-worker", extras = ["amqp"], specifier = "~=0.14.1" },
+    { name = "icij-worker", extras = ["amqp"], specifier = "~=0.14.2" },
     { name = "numpy", marker = "extra == 'inference'", specifier = "~=1.26.4" },
     { name = "onnxruntime", marker = "extra == 'cpu'", specifier = "==1.19.2" },
     { name = "onnxruntime-gpu", marker = "extra == 'gpu'", specifier = "==1.19.2", index = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/" },
