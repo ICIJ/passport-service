@@ -61,21 +61,6 @@ dev = [
     "pytest-asyncio~=0.21.1",
 ]
 
-[tool.uv.sources]
-onnxruntime-gpu = [
-    { index = "onnx-nightly" },
-
-]
-
-[[tool.uv.index]]
-name = "pypi"
-url = "https://pypi.org/"
-
-[[tool.uv.index]]
-name = "onnx-nightly"
-url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/"
-explicit = true
-
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
