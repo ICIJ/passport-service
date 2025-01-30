@@ -1282,7 +1282,7 @@ wheels = [
 
 [[package]]
 name = "passport-service"
-version = "0.6.16"
+version = "0.6.17"
 source = { editable = "." }
 dependencies = [
     { name = "aio-pika" },
