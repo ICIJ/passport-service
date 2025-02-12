@@ -14,6 +14,7 @@ from icij_common.pydantic_utils import ICIJModel
 from icij_worker import TaskState
 from icij_worker.objects import ErrorEvent, Registrable, Task, TaskError
 from icij_worker.typing_ import AbstractSetIntStr, DictStrAny, MappingIntStrAny
+from pydantic import parse_obj_as
 
 from passport_service.constants import GOTENBERG_SUPPORTED_EXTS
 
@@ -166,7 +167,7 @@ class PreprocessingRequest(ICIJModel):
 
 
 class PreprocessingTaskRequest(PreprocessingRequest):
-    docs: list[DocMetadata] | Path
+    docs: list[DocMetadata | Path] | Path
     batch_size: Optional[int] = 64
     detection_args: dict[str, Any]
 
@@ -211,6 +212,35 @@ def as_doc_metadata(
         dir_docs = (DocMetadata(path=p, extension=ext) for p, ext in dir_docs)
         docs.extend(dir_docs)
     docs = sorted(docs, key=lambda x: x.path)
+    return docs
+
+
+def parse_preprocessing_request(
+    docs: str | list[dict | str], *, data_dir: Path
+) -> list[DocMetadata]:
+    if isinstance(docs, str):
+        logger.debug("exploring files in %s", data_dir.absolute())
+        docs_dir = Path(data_dir) / docs
+        docs = as_doc_metadata(docs_dir, data_dir=data_dir)
+        logger.debug("found %s and more ...", docs[:10])
+        return docs
+    docs = parse_obj_as(list[DocMetadata | Path], docs)
+    if not docs:
+        return []
+    if isinstance(docs[0], Path):
+        doc_meta = []
+        unknown_exts = []
+        for doc in docs:
+            _, ext = os.path.splitext(str(doc))
+            if not ext:
+                unknown_exts.append(doc)
+            else:
+                doc_meta.append(
+                    DocMetadata(path=doc.relative_to(data_dir), extension=ext)
+                )
+        if unknown_exts:
+            raise ValueError(f"found files with unknown extensions {unknown_exts}")
+        return doc_meta
     return docs
 
 
