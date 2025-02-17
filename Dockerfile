@@ -79,7 +79,7 @@ ADD passport_service  ./passport_service/
 # Then install service
 RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra gpu
 RUN rm -rf ~/.cache/pip $(uv cache dir)
-ENTRYPOINT ["uv", "run", "python", "-m", "icij_worker", "workers", "start", "passport_service.app.app", "-g", "inference"]
+ENTRYPOINT ["/bin/bash"]
 
 FROM inference-base AS inference-worker-cpu
 # Install deps first to optimize layer cache
@@ -91,4 +91,4 @@ ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
 RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra cpu
 RUN rm -rf ~/.cache/pip $(uv cache dir)
-ENTRYPOINT ["uv", "run", "python", "-m", "icij_worker", "workers", "start", "passport_service.app.app", "-g", "inference"]
+ENTRYPOINT ["/bin/bash"]

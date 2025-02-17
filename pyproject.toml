@@ -1,5 +1,6 @@
 [project]
 name = "passport-service"
+# Don't update the version otherwise it invalidates caching
 version = "0.6.20"
 description = "Passport detection service"
 authors = [
