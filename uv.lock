@@ -644,16 +644,16 @@ wheels = [
 
 [[package]]
 name = "icij-worker"
-version = "0.14.2"
+version = "0.14.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "icij-common" },
     { name = "typer" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/76/0b/49471912dd8eb35b10a83ab4c2dae8578c7d9347ef3d1915b5cfdc8459c7/icij_worker-0.14.2.tar.gz", hash = "sha256:329180b60781aeccabfcce24220b44ad7c419f67aca27ed651166c3ee9759097", size = 57785 }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/a7/549c5c8a9103c5e14669c7a6a495f08306b2df4dffa7e9a32f423a94d5fb/icij_worker-0.14.3.tar.gz", hash = "sha256:66848e03515b0b219898a8989414701dfc41f4c47713a4cc5bebbef290d69a82", size = 57764 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/a8/eaf43757390c3d2f610582716506f726a146ba7abf2ec97b20500fa8dbf7/icij_worker-0.14.2-py3-none-any.whl", hash = "sha256:a2347006353e35b2e62bd43c10c06d42796f06e5d859258b677a5a992913fbf2", size = 79409 },
+    { url = "https://files.pythonhosted.org/packages/91/68/bc20f39adb0f76c055d1bd12ed1dc531325fb016541a38847f6d336a5af1/icij_worker-0.14.3-py3-none-any.whl", hash = "sha256:74b2e64a8b0ffc2e4f1f44517d3e3b155227d0f73779ea5e3f39dd51b080adac", size = 79413 },
 ]
 
 [package.optional-dependencies]
@@ -1328,7 +1328,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.111.1" },
     { name = "fastapi", marker = "extra == 'http'", specifier = "~=0.111.1" },
     { name = "gunicorn", marker = "extra == 'http'", specifier = "~=22.0.0" },
-    { name = "icij-worker", extras = ["amqp"], specifier = "~=0.14.2" },
+    { name = "icij-worker", extras = ["amqp"], specifier = "~=0.14.3" },
     { name = "numpy", marker = "extra == 'inference'", specifier = "~=1.26.4" },
     { name = "onnxruntime", marker = "extra == 'cpu'", specifier = "~=1.18.1" },
     { name = "onnxruntime-gpu", marker = "extra == 'gpu'", specifier = "~=1.18.1", index = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/" },

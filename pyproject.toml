@@ -10,7 +10,7 @@ requires-python = "~=3.10"
 dependencies = [
     "aiostream~=0.6.1",
     "aiohttp~=3.10.10",
-    "icij-worker[amqp]~=0.14.2",
+    "icij-worker[amqp]~=0.14.3",
     "aio-pika==9.4.2",
     "aiormq==6.8.0",
     "fastapi>=0.111.1",
