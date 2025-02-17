@@ -52,7 +52,7 @@ RUN wget https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_6
     && dpkg -i cuda-keyring_1.1-1_all.deb \
     && add-apt-repository contrib \
     && apt-get update
-RUN apt-get -y install cuda-toolkit-12-6 cudnn9-cuda-12
+RUN apt-get -y install cuda-toolkit-12-8 cudnn9-cuda-12
 ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
 RUN --mount=type=cache,target=~/.cache/uv cd passport_service && uv sync -vvv --frozen --compile-bytecode --extra inference --extra gpu
