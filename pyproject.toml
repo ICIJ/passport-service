@@ -1,6 +1,6 @@
 [project]
 name = "passport-service"
-version = "0.6.17"
+version = "0.6.18"
 description = "Passport detection service"
 authors = [
     { name = "Clément Doumouro", email = "cdoumouro@icij.org" },
