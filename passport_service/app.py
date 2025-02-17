@@ -12,7 +12,11 @@ from passport_service.constants import (
     PREPROCESSING_GROUP,
     Colorspace,
 )
-from passport_service.objects import DetectionRequest, DocMetadata, as_doc_metadata
+from passport_service.objects import (
+    DetectionRequest,
+    DocMetadata,
+    parse_preprocessing_request,
+)
 from passport_service.tasks.dependencies import (
     APP_LIFESPAN_DEPS,
     lifespan_config,
@@ -28,7 +32,7 @@ app = AsyncApp("passport-detection", dependencies=APP_LIFESPAN_DEPS)
 
 @app.task(name=CREATE_PREPROCESSING_TASKS_TASK, group=PREPROCESSING_GROUP)
 async def create_preprocessing_tasks(
-    docs: str | list[dict],
+    docs: str | list[dict | str],
     batch_size: int = 64,
     *,
     detection_args: dict,
@@ -37,15 +41,9 @@ async def create_preprocessing_tasks(
         create_preprocessing_tasks as create_preprocessing_tasks_,
     )
 
-    if isinstance(docs, str):
-        config = lifespan_config()
-        data_dir = config.data_dir
-        logger.debug("exploring files in %s", data_dir.absolute())
-        docs_dir = Path(config.data_dir) / docs
-        docs = as_doc_metadata(docs_dir, data_dir=data_dir)
-        logger.debug("found %s and more ...", docs[:10])
-    else:
-        docs = parse_obj_as(list[DocMetadata], docs)
+    config = lifespan_config()
+    data_dir = config.data_dir
+    docs = parse_preprocessing_request(docs, data_dir=data_dir)
     task_client = lifespan_task_client()
     tasks_ids = await create_preprocessing_tasks_(
         docs, task_client, batch_size, detection_args
