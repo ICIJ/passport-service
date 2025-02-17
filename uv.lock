@@ -1218,7 +1218,7 @@ wheels = [
 [[package]]
 name = "onnxruntime-gpu"
 version = "1.18.1"
-source = { registry = "https://pypi.org/simple" }
+source = { registry = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/" }
 dependencies = [
     { name = "coloredlogs" },
     { name = "flatbuffers" },
@@ -1228,12 +1228,12 @@ dependencies = [
     { name = "sympy" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/52/fa9ba5a69cfed82ba1765882f50664b05c26982f55fec6edd1bda700195f/onnxruntime_gpu-1.18.1-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e9de7b8c7c975f7830d1e9323daca2090408df821f2adc10ea267b4f469b59e0", size = 200801022 },
-    { url = "https://files.pythonhosted.org/packages/39/9b/665165a418bc45f1bc54561e19063a24b7fc2814ff5cd56e7601321e183d/onnxruntime_gpu-1.18.1-cp310-cp310-win_amd64.whl", hash = "sha256:7622a5979bb64a6631f888439b6ac8b11fbdd47da980425c697b82d4dd04b427", size = 157670940 },
-    { url = "https://files.pythonhosted.org/packages/92/2e/5c6a3c94a8e4794a0ad1ba00f5b86c89673f271f43c77f537a90db4472c0/onnxruntime_gpu-1.18.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:af2d3ee6fba72b57abf6f379b8aca30ee773959d4346271e7d92557dd5cf2901", size = 200794895 },
-    { url = "https://files.pythonhosted.org/packages/7d/78/ec2a3948600b1d3297d055d5a52175d71f45f1b2b41da749cf39973036b1/onnxruntime_gpu-1.18.1-cp311-cp311-win_amd64.whl", hash = "sha256:e40ba43771043fe286fea38b2c6549d1cc4b2b5b424624163c923163a8dc27ac", size = 157666628 },
-    { url = "https://files.pythonhosted.org/packages/a3/81/c364ca9c0b2260a38c7bc026b8a74e6bb8caa9e4fcc9f20438558b942b0f/onnxruntime_gpu-1.18.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:87d1884523f485f40d3a126677a9f93fc15569dd817fc753ee7fc519142a4425", size = 200797176 },
-    { url = "https://files.pythonhosted.org/packages/31/f0/84034a7592937f02ca3c671e50b767f86a721959619635fe40ffa14031e0/onnxruntime_gpu-1.18.1-cp312-cp312-win_amd64.whl", hash = "sha256:3f2ab38a62350965f5007111728410b3ef25213104dd1e7d61ecc158002ea3f5", size = 157671367 },
+    { url = "https://aiinfra.pkgs.visualstudio.com/2692857e-05ef-43b4-ba9c-ccf1c22c437c/_packaging/9387c3aa-d9ad-4513-968c-383f6f7f53b8/pypi/download/onnxruntime-gpu/1.18.1/onnxruntime_gpu-1.18.1-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:4e9a52f5d43a84fe29e135da6bf10daa18836c81bed9060a5924efd6afc0d259" },
+    { url = "https://aiinfra.pkgs.visualstudio.com/2692857e-05ef-43b4-ba9c-ccf1c22c437c/_packaging/9387c3aa-d9ad-4513-968c-383f6f7f53b8/pypi/download/onnxruntime-gpu/1.18.1/onnxruntime_gpu-1.18.1-cp310-cp310-win_amd64.whl", hash = "sha256:e7c1c665e8a11a5cf15369948b04288dc0a6812ad2e6beaff93a3d157c864d9a" },
+    { url = "https://aiinfra.pkgs.visualstudio.com/2692857e-05ef-43b4-ba9c-ccf1c22c437c/_packaging/9387c3aa-d9ad-4513-968c-383f6f7f53b8/pypi/download/onnxruntime-gpu/1.18.1/onnxruntime_gpu-1.18.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1334f802cb1e4e2eb6ceebc4ef71ba44f3ef444d34216baafb940368a7a5d2f5" },
+    { url = "https://aiinfra.pkgs.visualstudio.com/2692857e-05ef-43b4-ba9c-ccf1c22c437c/_packaging/9387c3aa-d9ad-4513-968c-383f6f7f53b8/pypi/download/onnxruntime-gpu/1.18.1/onnxruntime_gpu-1.18.1-cp311-cp311-win_amd64.whl", hash = "sha256:0ffcc711e89b80c935d5172544f8a605b11525fc1e6f0e78ee79e2c28956e2d9" },
+    { url = "https://aiinfra.pkgs.visualstudio.com/2692857e-05ef-43b4-ba9c-ccf1c22c437c/_packaging/9387c3aa-d9ad-4513-968c-383f6f7f53b8/pypi/download/onnxruntime-gpu/1.18.1/onnxruntime_gpu-1.18.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:bbb1a6c986b2392eebaebc43e198a1614e3f7d2c191725002dbfa0dceb24454b" },
+    { url = "https://aiinfra.pkgs.visualstudio.com/2692857e-05ef-43b4-ba9c-ccf1c22c437c/_packaging/9387c3aa-d9ad-4513-968c-383f6f7f53b8/pypi/download/onnxruntime-gpu/1.18.1/onnxruntime_gpu-1.18.1-cp312-cp312-win_amd64.whl", hash = "sha256:bee352929e6eec2ff4e11e323a025ed8bd5eac24795005bc502ac740971fa7bd" },
 ]
 
 [[package]]
@@ -1331,7 +1331,7 @@ requires-dist = [
     { name = "icij-worker", extras = ["amqp"], specifier = "~=0.14.2" },
     { name = "numpy", marker = "extra == 'inference'", specifier = "~=1.26.4" },
     { name = "onnxruntime", marker = "extra == 'cpu'", specifier = "~=1.18.1" },
-    { name = "onnxruntime-gpu", marker = "extra == 'gpu'", specifier = "~=1.18.1" },
+    { name = "onnxruntime-gpu", marker = "extra == 'gpu'", specifier = "~=1.18.1", index = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/" },
     { name = "opencv-python", marker = "extra == 'inference'", specifier = "~=4.10.0.84" },
     { name = "passporteye", marker = "extra == 'inference'", specifier = "~=2.2.1" },
     { name = "passporteye", marker = "extra == 'preprocessing'", specifier = "~=2.2.1" },

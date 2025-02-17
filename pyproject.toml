@@ -53,6 +53,14 @@ preprocessing = [
     "tenacity~=9.0.0",
 ]
 
+[[tool.uv.index]]
+name = "onnx-cuda12-nightly"
+url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/"
+explicit = true
+
+[tool.uv.sources]
+onnxruntime-gpu = { index = "onnx-cuda12-nightly" }
+
 [dependency-groups]
 dev = [
     "black~=24.4.2",
