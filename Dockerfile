@@ -67,7 +67,7 @@ RUN wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_6
     && dpkg -i cuda-keyring_1.1-1_all.deb \
     && add-apt-repository contrib \
     && apt-get update
-RUN apt-get -y install cuda-toolkit-12-3 cudnn9-cuda-12
+RUN apt-get -y install cuda-toolkit-12-4 cudnn9-cuda-12
 # Install deps first to optimize layer cache
 RUN --mount=type=cache,target=~/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
