@@ -36,9 +36,6 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Set up QEMU
-        uses: https://github.com/docker/setup-qemu-action@v2
-
       - name: Set up Docker Buildx
         uses: https://github.com/docker/setup-buildx-action@v2
 
@@ -84,7 +81,6 @@ jobs:
         with:
           context: .
           target: passport-service
-          platforms: linux/amd64
           push: true
           cache-from: type=registry,ref=${{ secrets.REGISTRY_NAME }}/passportservice:buildcache
           cache-to: type=registry,ref=${{ secrets.REGISTRY_NAME }}/passportservice:buildcache,mode=max
@@ -98,7 +94,6 @@ jobs:
         with:
           context: .
           target: preprocessing-worker
-          platforms: linux/amd64
           push: true
           cache-from: type=registry,ref=${{ secrets.REGISTRY_NAME }}/preprocessing-worker:buildcache
           cache-to: type=registry,ref=${{ secrets.REGISTRY_NAME }}/preprocessing-worker:buildcache,mode=max
@@ -112,7 +107,6 @@ jobs:
         with:
           context: .
           target: inference-worker
-          platforms: linux/amd64
           push: true
           cache-from: type=registry,ref=${{ secrets.REGISTRY_NAME }}/inference-worker:buildcache
           cache-to: type=registry,ref=${{ secrets.REGISTRY_NAME }}/inference-worker:buildcache,mode=max
