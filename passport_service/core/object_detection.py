@@ -9,29 +9,23 @@ from io import BytesIO
 from pathlib import Path
 from typing import cast
 
-import cv2
 import Levenshtein as Lev
+import cv2
 import numpy as np
 import onnxruntime as rt
 import pycountry
+from PIL.Image import fromarray
 from cv2.dnn import NMSBoxes, blobFromImage
 from cv2.typing import MatLike
 from icij_worker.typing_ import RateProgress
 from icij_worker.utils.progress import to_raw_progress
 from onnxruntime import SessionOptions
-from PIL.Image import fromarray
 
-from ..constants import COLOR_LUT, PIL_PNG, Colorspace
-from ..objects import (
-    MRZ,
-    DetectionRequest,
-    DocPageDetection,
-    ObjectDetection,
-    Passport,
-    PassportDetection,
-)
-from ..typing_ import BoxLocation, PassportEyeMRZ
 from .mrz import read_passport_file_mrz
+from ..constants import COLOR_LUT, Colorspace, PIL_PNG
+from ..objects import (DetectionRequest, DocPageDetection, MRZ, ObjectDetection,
+                       Passport, PassportDetection)
+from ..typing_ import BoxLocation, PassportEyeMRZ
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +152,7 @@ def inference_session(path: Path) -> Generator[rt.InferenceSession, None, None]:
     sess = None
     try:
         sess_options = SessionOptions()
-        sess_options.log_severity_level = 0
+        sess_options.log_severity_level = 1
         sess = rt.InferenceSession(
             path, providers=_DEFAULT_PROVIDERS, sess_options=sess_options
         )
