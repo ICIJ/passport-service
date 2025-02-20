@@ -1,6 +1,7 @@
 import gc
 import logging
 import re
+import time
 from collections import defaultdict
 from collections.abc import AsyncGenerator, Generator, Iterable, Sequence
 from contextlib import contextmanager
@@ -10,29 +11,23 @@ from io import BytesIO
 from pathlib import Path
 from typing import cast
 
-import cv2
 import Levenshtein as Lev
+import cv2
 import numpy as np
 import onnxruntime as rt
 import pycountry
+from PIL.Image import fromarray
 from cv2.dnn import NMSBoxes, blobFromImage
 from cv2.typing import MatLike
 from icij_worker.typing_ import RateProgress
 from icij_worker.utils.progress import to_raw_progress
 from onnxruntime import SessionOptions
-from PIL.Image import fromarray
 
-from ..constants import COLOR_LUT, PIL_PNG, Colorspace
-from ..objects import (
-    MRZ,
-    DetectionRequest,
-    DocPageDetection,
-    ObjectDetection,
-    Passport,
-    PassportDetection,
-)
-from ..typing_ import BoxLocation, PassportEyeMRZ
 from .mrz import read_passport_file_mrz
+from ..constants import COLOR_LUT, Colorspace, PIL_PNG
+from ..objects import (DetectionRequest, DocPageDetection, MRZ, ObjectDetection,
+                       Passport, PassportDetection)
+from ..typing_ import BoxLocation, PassportEyeMRZ
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +59,7 @@ async def detect_passports(
     country_codes: list[str],
     progress: RateProgress | None = None,
 ) -> AsyncGenerator[PassportDetection, None]:
+    start_classif = time.process_time()
     n_inputs = len(inputs)
     errors = [i for i in inputs if i.error]
     for e in errors:
@@ -80,8 +76,9 @@ async def detect_passports(
         progress = to_raw_progress(progress, n_batches)
     pages_it = _batched_pages_it(inputs, batch_size)
     buffer = defaultdict(list)
-    n_pages = {i: len(req.pages) for i, req in enumerate(inputs)}
+    n_pages = 0
     for n_batch, batch in enumerate(pages_it):
+        n_pages += len(batch)
         preprocessed = (
             preprocess_image(cv2.imread(str(item.page_path))) for item in batch
         )
@@ -103,8 +100,11 @@ async def detect_passports(
             await progress(n_batch)
     if buffer:
         msg = "inconsistent state: buffer was not emptied"
-        msg += f"\nbuffer: {buffer}\nn_pages: {n_pages}"
+        msg += f"\nbuffer: {buffer}"
         raise ValueError(msg)
+    elapsed_time = time.process_time() - start_classif
+    speed = n_pages / elapsed_time
+    logger.info("processed %s docs - processing speed: %s pages / sec", n_pages, speed)
 
 
 def _batched_pages_it(
