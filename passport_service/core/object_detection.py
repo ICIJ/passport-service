@@ -2,38 +2,35 @@ import gc
 import logging
 import re
 from collections import defaultdict
-from collections.abc import AsyncGenerator, Generator, Sequence
+from collections.abc import AsyncGenerator, Generator, Iterable, Sequence
 from contextlib import contextmanager
+from dataclasses import dataclass
 from functools import partial
 from io import BytesIO
 from pathlib import Path
 from typing import cast
 
-import cv2
 import Levenshtein as Lev
+import cv2
 import numpy as np
 import onnxruntime as rt
 import pycountry
+from PIL.Image import fromarray
 from cv2.dnn import NMSBoxes, blobFromImage
 from cv2.typing import MatLike
 from icij_worker.typing_ import RateProgress
 from icij_worker.utils.progress import to_raw_progress
 from onnxruntime import SessionOptions
-from PIL.Image import fromarray
 
-from ..constants import COLOR_LUT, PIL_PNG, Colorspace
-from ..objects import (
-    MRZ,
-    DetectionRequest,
-    DocPageDetection,
-    ObjectDetection,
-    Passport,
-    PassportDetection,
-)
-from ..typing_ import BoxLocation, PassportEyeMRZ
 from .mrz import read_passport_file_mrz
+from ..constants import COLOR_LUT, Colorspace, PIL_PNG
+from ..objects import (DetectionRequest, DocPageDetection, MRZ, ObjectDetection,
+                       Passport, PassportDetection)
+from ..typing_ import BoxLocation, PassportEyeMRZ
 
 logger = logging.getLogger(__name__)
+
+_DEFAULT_PROVIDERS = ["CUDAExecutionProvider", "CPUExecutionProvider"]
 
 DEFAULT_DETECTION_THRESHOLD = 0.05
 DEFAULT_NMS_THRESHOLD = 0.45
@@ -42,6 +39,13 @@ DEFAULT_NMS_ETA = 0.5
 
 _DEU_PATTERN_0 = re.compile(r"[0-9]D.")
 _DEU_PATTERN_1 = re.compile(r"D<<")
+
+
+@dataclass
+class _BatchItem:
+    page_path: str
+    is_last_page: bool
+    doc_path: str
 
 
 async def detect_passports(
@@ -71,13 +75,13 @@ async def detect_passports(
     pages_it = _batched_pages_it(inputs, batch_size)
     buffer = defaultdict(list)
     n_pages = {i: len(req.pages) for i, req in enumerate(inputs)}
-    for n_batch, (doc_idxs, page_paths) in enumerate(pages_it):
+    for n_batch, batch in enumerate(pages_it):
         preprocessed = (
-            preprocess_image(cv2.imread(str(page_path))) for page_path in page_paths
+            preprocess_image(cv2.imread(str(item.page_path))) for item in batch
         )
         pages, blobs, scales = zip(*preprocessed)
-        batch = list(zip(blobs, scales))
-        passports_per_page = zip(pages, detect_objects(sess, batch, classes))
+        batch_inputs = list(zip(blobs, scales))
+        passports_per_page = zip(pages, detect_objects(sess, batch_inputs, classes))
         if read_mrz:
             passports_per_page = (
                 [
@@ -86,10 +90,7 @@ async def detect_passports(
                 ]
                 for page, passports in passports_per_page
             )
-        doc_paths = [inputs[doc_ix].doc_path for doc_ix in doc_idxs]
-        buffer, detections = _update_buffer(
-            buffer, dict(zip(doc_idxs, passports_per_page)), n_pages, doc_paths
-        )
+        buffer, detections = _update_buffer(buffer, zip(batch, passports_per_page))
         for detection in detections:
             yield detection
         if progress is not None:
@@ -102,55 +103,51 @@ async def detect_passports(
 
 def _batched_pages_it(
     inputs: Sequence[DetectionRequest], batch_size: int
-) -> Generator[tuple[list[int], list[Path]], None, None]:
+) -> Generator[list[_BatchItem], None, None]:
     batch = []
-    for doc_i, req in enumerate(inputs):
-        for page in req.pages:
-            batch.append((doc_i, page))
+    for req in inputs:
+        last_page_ix = len(req.pages) - 1
+        for page_i, page in enumerate(req.pages):
+            is_last_page = page_i == last_page_ix
+            item = _BatchItem(
+                page_path=str(page),
+                is_last_page=is_last_page,
+                doc_path=str(req.doc_path),
+            )
+            batch.append(item)
             if len(batch) == batch_size:
-                doc_ixs, pages = zip(*batch)
-                yield list(doc_ixs), list(pages)
+                yield batch
                 batch.clear()
     if batch:
-        doc_ixs, pages = zip(*batch)
-        yield list(doc_ixs), list(pages)
+        yield batch
         batch.clear()
 
 
 def _update_buffer(
-    buffer: dict[int, list[list[Passport]]],
-    passports_per_page: dict[int, list[ObjectDetection]],
-    n_pages: dict[int, int],
-    doc_paths: Sequence[Path],
-) -> tuple[dict[int, list[list[Passport]]], list[PassportDetection]]:
+    buffer: dict[str, list[list[Passport]]],
+    passport_detections: Iterable[tuple[_BatchItem, list[ObjectDetection]]],
+) -> tuple[dict[str, list[list[Passport]]], list[PassportDetection]]:
     detections = []
-    for doc_ix, page_detections in passports_per_page.items():
+    for batch_item, page_detections in passport_detections:
         page_passports = []
         for page_detection in page_detections:
             passport = page_detection
             if not isinstance(passport, Passport):  # no mrz detection
                 passport = Passport.from_detection(passport)
             page_passports.append(passport)
-        buffer[doc_ix].append(page_passports)
-    to_pop = []
-    for doc_ix, pages in buffer.items():
-        if len(pages) == n_pages[doc_ix]:
-            doc_path = doc_paths[doc_ix]
-            to_pop.append(doc_ix)
-            doc_passports = buffer[doc_ix]
+        buffer[batch_item.doc_path].append(page_passports)
+        if batch_item.is_last_page:
+            doc_passports = buffer.pop(batch_item.doc_path)
             doc_passports = [
                 DocPageDetection(page=page_i, passports=passports)
                 for page_i, passports in enumerate(doc_passports)
                 if passports
             ]
-            detection = PassportDetection(doc_path=doc_path, doc_pages=doc_passports)
+            detection = PassportDetection(
+                doc_path=Path(batch_item.doc_path), doc_pages=doc_passports
+            )
             detections.append(detection)
-    for ix in to_pop:
-        buffer.pop(ix)
     return buffer, detections
-
-
-_DEFAULT_PROVIDERS = ["CUDAExecutionProvider", "CPUExecutionProvider"]
 
 
 @contextmanager
