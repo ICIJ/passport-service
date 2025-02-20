@@ -10,7 +10,7 @@ from abc import ABC
 from pathlib import Path
 from typing import Any, Callable, NoReturn, Optional, Union
 
-from icij_common.pydantic_utils import ICIJModel
+from icij_common.pydantic_utils import ICIJModel, safe_copy
 from icij_worker import TaskState
 from icij_worker.objects import ErrorEvent, Registrable, Task, TaskError
 from icij_worker.typing_ import AbstractSetIntStr, DictStrAny, MappingIntStrAny
@@ -97,7 +97,10 @@ class ProcessingReport(DetectionRequest):
         pages = self.pages
         if pages is not None:
             pages = [p.relative_to(work_dir) for p in pages]
-        return ProcessingReport(doc_path=doc_path, pdf_path=pdf_path, pages=pages)
+        relative = safe_copy(
+            self, update={"doc_path": doc_path, "pdf_path": pdf_path, "pages": pages}
+        )
+        return relative
 
 
 class ProcessingResponse(ICIJModel):

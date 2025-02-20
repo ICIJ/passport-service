@@ -1,25 +1,24 @@
 import hashlib
 import logging
 import os
-from collections.abc import AsyncGenerator, Generator, Iterable
+from collections.abc import AsyncGenerator, Iterable
 from concurrent.futures import ProcessPoolExecutor
 from copy import deepcopy
 from functools import lru_cache, partial
 from pathlib import Path
 
 import pymupdf
+from PIL import Image, UnidentifiedImageError
 from icij_common.pydantic_utils import safe_copy
 from icij_worker.typing_ import RateProgress, RawProgress
 from icij_worker.utils.progress import to_raw_progress, to_scaled_progress
-from PIL import Image, UnidentifiedImageError
 from pymupdf import EmptyFileError, FileDataError
 
 from passport_service.utils import run_with_concurrency
-
-from ..constants import COLOR_LUT, PDF_EXT, PIL_PNG, PNG_EXT, Colorspace
+from .pdf_conversion import GotenbergClient, should_convert_to_pdf
+from ..constants import COLOR_LUT, Colorspace, PDF_EXT, PIL_PNG, PNG_EXT
 from ..exceptions import InvalidImage, InvalidPDF, UnsupportedDocExtension
 from ..objects import DocMetadata, Error, ProcessingReport
-from .pdf_conversion import GotenbergClient, should_convert_to_pdf
 
 DEFAULT_DOC_PROCESSING_BATCH_SIZE = 10
 
@@ -56,7 +55,7 @@ async def preprocess_docs(
     # TODO: use an enum here ?
     colorspace: Colorspace = Colorspace.RGB,
     progress: RateProgress | None = None,
-) -> Generator[ProcessingReport, None, None]:
+) -> AsyncGenerator[ProcessingReport, None]:
     n_processes = executor._max_workers
     # TODO: remove this when a proper PDF service is running
     docs_metadata = deepcopy(docs_metadata)
