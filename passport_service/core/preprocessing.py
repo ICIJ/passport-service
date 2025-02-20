@@ -8,17 +8,18 @@ from functools import lru_cache, partial
 from pathlib import Path
 
 import pymupdf
-from PIL import Image, UnidentifiedImageError
 from icij_common.pydantic_utils import safe_copy
 from icij_worker.typing_ import RateProgress, RawProgress
 from icij_worker.utils.progress import to_raw_progress, to_scaled_progress
+from PIL import Image, UnidentifiedImageError
 from pymupdf import EmptyFileError, FileDataError
 
 from passport_service.utils import run_with_concurrency
-from .pdf_conversion import GotenbergClient, should_convert_to_pdf
-from ..constants import COLOR_LUT, Colorspace, PDF_EXT, PIL_PNG, PNG_EXT
+
+from ..constants import COLOR_LUT, PDF_EXT, PIL_PNG, PNG_EXT, Colorspace
 from ..exceptions import InvalidImage, InvalidPDF, UnsupportedDocExtension
 from ..objects import DocMetadata, Error, ProcessingReport
+from .pdf_conversion import GotenbergClient, should_convert_to_pdf
 
 DEFAULT_DOC_PROCESSING_BATCH_SIZE = 10
 
