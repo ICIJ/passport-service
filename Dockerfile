@@ -62,8 +62,8 @@ RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6 tesseract-ocr
 
 FROM inference-base AS inference-worker
 # TODO: fix that for ARM
-ENV NVIDIA_VISIBLE_DEVICES all
-ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 RUN apt-get -y install wget software-properties-common
 RUN wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.1-1_all.deb \
     && dpkg -i cuda-keyring_1.1-1_all.deb \
