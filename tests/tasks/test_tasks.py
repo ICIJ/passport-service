@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 from aiohttp.typedefs import StrOrURL
-from icij_common.pydantic_utils import jsonable_encoder
-from pydantic import parse_obj_as
+from fastapi.encoders import jsonable_encoder
+from pydantic import TypeAdapter
 
 from passport_service.app import (
     create_preprocessing_tasks,
@@ -78,7 +78,7 @@ async def test_passport_pipeline(
 
     # Given
     request = as_doc_metadata(data_dir=data_dir, docs_dir=docs_dir)
-    request = [r.dict(by_alias=True) for r in request]
+    request = [r.model_dump(by_alias=True) for r in request]
 
     # When
     @asynccontextmanager
@@ -116,7 +116,7 @@ async def test_passport_pipeline(
 
     # When
     detections = await detect_passports(reports, **detection_args)
-    detections = parse_obj_as(list[PassportDetection], detections)
+    detections = TypeAdapter(list[PassportDetection]).validate_python(detections)
     detections = sorted(detections, key=lambda x: x.doc_path)
     # Then
     assert len(detections) == 6
@@ -149,7 +149,9 @@ async def test_passport_pipeline(
     assert mrz.metadata["names"] == "JANE"
     assert mrz.metadata["surname"] == "SMITH"
 
-    for i, path in zip([2, 3, 4], ["passport.docx", "passport.odt", "passport.pdf"]):
+    for i, path in zip(
+        [2, 3, 4], ["passport.docx", "passport.odt", "passport.pdf"], strict=True
+    ):
         passport = detections[i]
         assert passport.doc_path.name == path
         assert len(passport.doc_pages) == 1

@@ -1,7 +1,7 @@
+from collections.abc import Callable
 from io import BytesIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Callable
 
 import numpy as np
 from imageio import imwrite

@@ -34,7 +34,7 @@ def test_config(rabbit_mq_session: str) -> HttpServiceConfig:  # noqa: ARG001
         app_path="passport_service.app.app",
         storage=PostgresStorageConfig(port=POSTGRES_TEST_PORT),
     )
-    config = HttpServiceConfig[AMQPTaskManagerConfig](task_manager=task_manager)
+    config = HttpServiceConfig(task_manager=task_manager)
     return config
 
 

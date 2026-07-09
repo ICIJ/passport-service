@@ -2,7 +2,13 @@
 from datetime import datetime
 
 from icij_worker import Task, TaskState
-from icij_worker.objects import ErrorEvent, ResultEvent, StacktraceItem, TaskError
+from icij_worker.objects import (
+    ErrorEvent,
+    ResultEvent,
+    StacktraceItem,
+    TaskError,
+    TaskResult,
+)
 from starlette.testclient import TestClient
 
 from passport_service.http_ import tasks
@@ -11,7 +17,7 @@ from passport_service.http_ import tasks
 async def test_put_task(test_client: TestClient, monkeypatch) -> None:  # noqa: ANN001
     # Given
     task_id = "some_id"
-    task = {"name": "some-task", "args": []}
+    task = {"name": "some-task", "args": {}}
 
     class _MockManager:
         async def save_task(self, task: Task) -> bool:  # noqa: ARG002
@@ -53,6 +59,7 @@ async def test_get_task(test_client: TestClient, monkeypatch) -> None:  # noqa: 
     res = test_client.get(task_url)
     assert res.status_code == 200, res.json()
     expected_task = {
+        "@type": "Task",
         "args": dict(),
         "completedAt": None,
         "createdAt": task.created_at.isoformat(),
@@ -125,7 +132,7 @@ def test_get_task_error_should_return_404_for_unknown_task(
 
 def test_get_task_result(test_client: TestClient, monkeypatch) -> None:  # noqa: ANN001
     # Given
-    result = "some_result"
+    result = TaskResult(value="")
     result_event = ResultEvent(
         task_id="some_task_id", created_at=datetime.now(), result=result
     )
@@ -143,7 +150,7 @@ def test_get_task_result(test_client: TestClient, monkeypatch) -> None:  # noqa:
 
     # Then
     res = res.json()
-    assert res == result
+    assert res == result.model_dump()
 
 
 def test_get_task_result_should_return_404_for_unknown_task(

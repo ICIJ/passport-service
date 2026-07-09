@@ -88,9 +88,11 @@ async def detect_passports(
         preprocessed = (
             preprocess_image(cv2.imread(str(item.page_path))) for item in batch
         )
-        pages, blobs, scales = zip(*preprocessed)
-        batch_inputs = list(zip(blobs, scales))
-        passports_per_page = zip(pages, detect_objects(sess, batch_inputs, classes))
+        pages, blobs, scales = zip(*preprocessed, strict=True)
+        batch_inputs = list(zip(blobs, scales, strict=True))
+        passports_per_page = zip(
+            pages, detect_objects(sess, batch_inputs, classes), strict=True
+        )
         if read_mrz:
             passports_per_page = (
                 [
@@ -99,7 +101,9 @@ async def detect_passports(
                 ]
                 for page, passports in passports_per_page
             )
-        buffer, detections = _update_buffer(buffer, zip(batch, passports_per_page))
+        buffer, detections = _update_buffer(
+            buffer, zip(batch, passports_per_page, strict=True)
+        )
         for detection in detections:
             yield detection
         if progress is not None:
@@ -202,7 +206,7 @@ def detect_objects(
 ) -> Generator[list[ObjectDetection], None, None]:
     if not inputs:
         return
-    blobs, scales = zip(*inputs)
+    blobs, scales = zip(*inputs, strict=True)
     blobs = np.concatenate(blobs)
     scales = list(scales)
     input_name = sess.get_inputs()[0].name
@@ -214,7 +218,7 @@ def detect_objects(
     outputs = np.array(outputs, dtype=np.float32).reshape(
         (-1, outputs.shape[-2], outputs.shape[-1])
     )
-    for output, scale in zip(outputs, scales):
+    for output, scale in zip(outputs, scales, strict=True):
         detection = detections_from_nn_output(
             output,
             classes,
@@ -259,7 +263,7 @@ def detections_from_nn_output(
         detections.append((box, class_ix, confidence))
     if not detections:
         return []
-    boxes, class_ixs, scores = zip(*detections)
+    boxes, class_ixs, scores = zip(*detections, strict=True)
     boxes = list(boxes)
     scores = list(scores)
     class_ixs = list(class_ixs)

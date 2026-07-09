@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 from icij_worker import AsyncApp
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 
 from passport_service.constants import (
     CREATE_PREPROCESSING_TASKS_TASK,
@@ -37,7 +37,7 @@ async def create_preprocessing_tasks(
     *,
     detection_args: dict,
 ) -> list[str]:
-    from passport_service.tasks.preprocessing import (
+    from passport_service.tasks.preprocessing import (  # noqa: PLC0415
         create_preprocessing_tasks as create_preprocessing_tasks_,
     )
 
@@ -51,15 +51,20 @@ async def create_preprocessing_tasks(
     return tasks_ids
 
 
+_DOC_METADATA_TA = TypeAdapter(list[DocMetadata])
+
+
 @app.task(name=PREPROCESS_DOCS_TASK, group=PREPROCESSING_GROUP)
 async def preprocess_docs(docs: list[dict], detection_args: dict) -> dict:
-    from passport_service.tasks.preprocessing import preprocess_docs_task
+    from passport_service.tasks.preprocessing import (  # noqa: PLC0415
+        preprocess_docs_task,
+    )
 
     config = lifespan_config()
     data_dir = config.data_dir
     work_dir = config.work_dir
 
-    docs = parse_obj_as(list[DocMetadata], docs)
+    docs = _DOC_METADATA_TA.validate_python(docs)
     executor = lifespan_pool_executor()
     gotenberg_client = lifespan_gotenberg_client()
     task_client = lifespan_task_client()
@@ -77,18 +82,25 @@ async def preprocess_docs(docs: list[dict], detection_args: dict) -> dict:
         preprocessing_batch_size=config.preprocessing_batch_size,
         pdf_conversion_concurrency=pdf_conversion_concurrency,
     )
-    response = response.dict(by_alias=True)
+    response = response.model_dump(by_alias=True)
     return response
+
+
+_DETECTION_REQUEST_TASK = TypeAdapter(list[DetectionRequest])
 
 
 @app.task(name=DETECT_PASSPORTS_TASKS, group=INFERENCE_GROUP)
 async def detect_passports(
     inputs: list[dict], model_path: Path, *, read_mrz: bool = True
 ) -> list[dict]:
-    from passport_service.core.object_detection import inference_session
-    from passport_service.tasks.inference import passport_detection_task
+    from passport_service.core.object_detection import (  # noqa: PLC0415
+        inference_session,
+    )
+    from passport_service.tasks.inference import (  # noqa: PLC0415
+        passport_detection_task,
+    )
 
-    inputs = parse_obj_as(list[DetectionRequest], inputs)
+    inputs = _DETECTION_REQUEST_TASK.validate_python(inputs)
     config = lifespan_config()
     work_dir = config.work_dir
     data_dir = config.data_dir
@@ -108,5 +120,5 @@ async def detect_passports(
             batch_size=batch_size,
             read_mrz=read_mrz,
         )
-        detections = [d.dict(by_alias=True) async for d in detections]
+        detections = [d.model_dump(by_alias=True) async for d in detections]
         return detections

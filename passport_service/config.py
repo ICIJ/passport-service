@@ -3,13 +3,16 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import cached_property
 from multiprocessing import Pool
 from pathlib import Path
-from typing import ClassVar, Generic, Optional
+from typing import ClassVar
 
 import icij_worker
-from icij_common.pydantic_utils import ICIJSettings, NoEnumModel
-from icij_worker.utils.config import TM, SettingsWithTM
+from icij_common.pydantic_utils import ICIJSettings, merge_configs
+from icij_worker.http_.config import HttpServiceConfig as BaseHttpServiceConfig
 from icij_worker.utils.logging_ import LogWithWorkerIDMixin
 from pydantic import Field
+from pydantic_settings import SettingsConfigDict
+
+from passport_service.objects import BaseModel
 
 try:
     from passport_service.core.pdf_conversion import GotenbergClient
@@ -26,13 +29,16 @@ import passport_service
 _ALL_LOGGERS = [passport_service.__name__, icij_worker.__name__]
 
 
-class AppConfig(ICIJSettings, LogWithWorkerIDMixin, NoEnumModel):
-    class Config:
-        env_prefix = "PASSPORT_ASYNC_"
+class AppConfig(ICIJSettings, BaseModel, LogWithWorkerIDMixin):
+    model_config = SettingsConfigDict(
+        env_prefix="PASSPORT_ASYNC_",
+        env_nested_delimiter="__",
+        nested_model_default_partial_update=True,
+    )
 
-    loggers: ClassVar[list[str]] = Field(_ALL_LOGGERS, const=True)
+    loggers: ClassVar[list[str]] = Field(_ALL_LOGGERS, frozen=True)
 
-    country_codes: Optional[list[str]] = None
+    country_codes: list[str] | None = None
     data_dir: Path
 
     gotenberg_url: str = "http://localhost:3000"
@@ -45,7 +51,7 @@ class AppConfig(ICIJSettings, LogWithWorkerIDMixin, NoEnumModel):
 
     inference_batch_size: int = 32
     log_level: str = Field(default="INFO")
-    n_mp_workers: Optional[int] = None
+    n_mp_workers: int | None = None
     passport_label: str = "passport"
     pdf_conversion_concurrency: int = 2
     preprocessing_batch_size: int = 10
@@ -81,15 +87,15 @@ class AppConfig(ICIJSettings, LogWithWorkerIDMixin, NoEnumModel):
         return client
 
 
-class HttpServiceConfig(SettingsWithTM[TM], LogWithWorkerIDMixin, Generic[TM]):
-    app_path: ClassVar[str] = Field(const=True, default="passport_service.app.app")
-    loggers: ClassVar[list[str]] = Field(
-        _ALL_LOGGERS + ["uvicorn", "__main__"], const=True
+class HttpServiceConfig(BaseHttpServiceConfig):
+    model_config = merge_configs(
+        BaseHttpServiceConfig.model_config,
+        SettingsConfigDict(
+            env_prefix="PASSPORT_HTTP_",
+            env_nested_delimiter="__",
+            nested_model_default_partial_update=True,
+            case_sensitive=False,
+        ),
     )
 
     gunicorn_workers: int = 1
-    log_level: str = Field(default="INFO")
-    port: int = 8080
-
-    class Config:
-        env_prefix = "PASSPORT_HTTP_"

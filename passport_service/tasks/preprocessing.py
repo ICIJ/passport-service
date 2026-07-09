@@ -61,7 +61,7 @@ async def preprocess_docs_task(
         )
     ]
     args = deepcopy(detection_args)
-    args["inputs"] = [r.dict(by_alias=True) for r in reports]
+    args["inputs"] = [r.model_dump(by_alias=True) for r in reports]
     task_id = await task_client.create_task(DETECT_PASSPORTS_TASKS, args)
     response = ProcessingResponse(detection_task_id=task_id, reports=reports)
     return response

@@ -87,7 +87,7 @@ async def test_preprocessing_task_should_return_429_when_too_many_tasks(
     tmp_path_factory: "TempPathFactory",  # noqa: F821
     monkeypatch,  # noqa: ANN001
 ) -> None:
-    from passport_service.http_ import passports
+    from passport_service.http_ import passports  # noqa: PLC0415
 
     # Given
     url = "/passports/preprocessing"
@@ -147,7 +147,7 @@ async def test_create_passport_detection_task_should_return_429_when_too_many_ta
     test_client: TestClient,
     monkeypatch,  # noqa: ANN001
 ) -> None:
-    from passport_service.http_ import passports
+    from passport_service.http_ import passports  # noqa: PLC0415
 
     url = "/passports/detection"
     payload = {

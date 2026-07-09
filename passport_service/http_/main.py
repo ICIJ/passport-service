@@ -15,7 +15,7 @@ def main_router() -> APIRouter:
 
     @router.get("/version")
     def version() -> Response:
-        import passport_service
+        import passport_service  # noqa: PLC0415
 
         package_version = importlib.metadata.version(passport_service.__name__)
 

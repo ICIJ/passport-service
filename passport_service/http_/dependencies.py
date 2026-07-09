@@ -17,9 +17,11 @@ logger = logging.getLogger(__name__)
 async def get_http_service_config(config: HttpServiceConfig | None, **_) -> None:
     global _HTTP_SERVICE_CONFIG
     if config is None:
-        config = HttpServiceConfig.from_env()
+        config = HttpServiceConfig()
     _HTTP_SERVICE_CONFIG = config
-    logger.info("HTTP Service config: %s\n", _HTTP_SERVICE_CONFIG.json(indent=2))
+    logger.info(
+        "HTTP Service config: %s\n", _HTTP_SERVICE_CONFIG.model_dump_json(indent=2)
+    )
 
 
 def lifespan_http_service_config() -> HttpServiceConfig:

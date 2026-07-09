@@ -2,7 +2,7 @@ import logging
 import uuid
 from typing import Any
 
-from icij_common.pydantic_utils import jsonable_encoder
+from fastapi.encoders import jsonable_encoder
 from icij_worker.utils.http import AiohttpClient
 
 logger = logging.getLogger(__name__)

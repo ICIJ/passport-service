@@ -10,10 +10,10 @@ def test_http_config_from_env(reset_env) -> None:  # noqa: ANN001, ARG001
     env = {
         "PASSPORT_HTTP_TASK_MANAGER__BACKEND": "amqp",
         "PASSPORT_HTTP_TASK_MANAGER__STORAGE__MAX_CONNECTIONS": "28",
+        "PASSPORT_HTTP_TASK_MANAGER__APP_PATH": "some_path",
     }
     os.environ.update(env)
     # When
-    config = HttpServiceConfig.from_env()
+    config = HttpServiceConfig()
     # Then
-
     assert isinstance(config.task_manager, AMQPTaskManagerConfig)

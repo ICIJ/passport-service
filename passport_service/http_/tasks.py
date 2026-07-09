@@ -3,14 +3,15 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from icij_common.logging_utils import TRACE, log_elapsed_time_cm
-from icij_common.pydantic_utils import ICIJModel
+from icij_worker import Task
 from icij_worker.exceptions import UnknownTask
+from icij_worker.objects import ErrorEvent
 from starlette.responses import Response
 from starlette.status import HTTP_204_NO_CONTENT
 
 from passport_service.http_.dependencies import lifespan_task_manager
 from passport_service.http_.doc import TASKS_TAG
-from passport_service.objects import ErrorEvent_, Task_, TaskSearch
+from passport_service.objects import BaseModel, TaskSearch
 
 logger = logging.getLogger(__name__)
 
@@ -18,14 +19,14 @@ logger = logging.getLogger(__name__)
 def tasks_router() -> APIRouter:
     router = APIRouter(tags=[TASKS_TAG])
 
-    class TaskCreationQuery(ICIJModel):
+    class TaskCreationQuery(BaseModel):
         name: str
         args: dict[str, Any]
 
     @router.put("/tasks/{task_id}")
     async def _create_task_(task_id: str, task: TaskCreationQuery) -> str:
         task_manager = lifespan_task_manager()
-        task = Task_.create(task_id=task_id, task_name=task.name, args=task.args)
+        task = Task.create(task_id=task_id, task_name=task.name, args=task.args)
         is_new = await task_manager.save_task(task)
         if not is_new:
             logger.debug('Task(id="%s") already exists, skipping...', task_id)
@@ -35,7 +36,7 @@ def tasks_router() -> APIRouter:
         logger.info('Task(id="%s") queued...', task_id)
         return Response(task.id, status_code=201)
 
-    async def _get_task_(task_id: str) -> Task_:
+    async def _get_task_(task_id: str) -> Task:
         task_manager = lifespan_task_manager()
         try:
             with log_elapsed_time_cm(
@@ -44,10 +45,10 @@ def tasks_router() -> APIRouter:
                 task = await task_manager.get_task(task_id=task_id)
         except UnknownTask as e:
             raise HTTPException(status_code=404, detail=e.args[0]) from e
-        return Task_(**task.dict())
+        return Task(**task.model_dump())
 
     @router.get("/tasks/{task_id}")
-    async def _get_task(task_id: str) -> Task_:
+    async def _get_task(task_id: str) -> Task:
         return await _get_task_(task_id)
 
     @router.get("/tasks/{task_id}/state", response_model=str)
@@ -74,22 +75,22 @@ def tasks_router() -> APIRouter:
         return result.result
 
     @router.get("/tasks/{task_id}/errors")
-    async def _get_task_errors(task_id: str) -> list[ErrorEvent_]:
+    async def _get_task_errors(task_id: str) -> list[ErrorEvent]:
         task_manager = lifespan_task_manager()
         try:
             errors = await task_manager.get_task_errors(task_id=task_id)
         except UnknownTask as e:
             raise HTTPException(status_code=404, detail=e.args[0]) from e
-        errors = [ErrorEvent_(**evt.dict()) for evt in errors]
+        errors = [ErrorEvent(**evt.model_dump()) for evt in errors]
         return errors
 
-    @router.post("/tasks", response_model=list[Task_])
-    async def _search_tasks(search: TaskSearch) -> list[Task_]:
+    @router.post("/tasks", response_model=list[Task])
+    async def _search_tasks(search: TaskSearch) -> list[Task]:
         task_manager = lifespan_task_manager()
         with log_elapsed_time_cm(logger, TRACE, "Searched tasks in {elapsed_time} !"):
             tasks = await task_manager.get_tasks(
                 group=None, task_type=search.name, status=search.status
             )
-        return [Task_(**t.dict()) for t in tasks]
+        return [Task(**t.model_dump()) for t in tasks]
 
     return router

@@ -30,17 +30,17 @@ def passports_router() -> APIRouter:
 
     @router.post("/passports/preprocessing-tasks", response_model=str)
     async def _create_preprocessing_tasks(request: PreprocessingTaskRequest) -> str:
-        args = request.dict(by_alias=True)
+        args = request.model_dump(by_alias=True)
         return await _create_task(args, CREATE_PREPROCESSING_TASKS_TASK)
 
     @router.post("/passports/preprocessing", response_model=str)
     async def _preprocess_documents(request: PreprocessingRequest) -> str:
-        args = request.dict(by_alias=True)
+        args = request.model_dump(by_alias=True)
         return await _create_task(args, PREPROCESS_DOCS_TASK)
 
     @router.post("/passports/detection", response_model=str)
     async def _detect_passports(request: PassportDetectionRequest) -> str:
-        args = request.dict(by_alias=True)
+        args = request.model_dump(by_alias=True)
         return await _create_task(args, DETECT_PASSPORTS_TASKS)
 
     return router

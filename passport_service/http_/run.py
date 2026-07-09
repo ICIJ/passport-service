@@ -5,7 +5,7 @@ import logging
 import sys
 import traceback
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Path
 from gunicorn.app.base import BaseApplication
 from icij_common.logging_utils import setup_loggers
 
@@ -46,9 +46,9 @@ class GunicornApp(BaseApplication):
 
 def _start_app(config_path: str | None = None) -> None:
     if config_path is not None:
-        config = HttpServiceConfig.parse_file(config_path)
+        config = HttpServiceConfig.model_validate_json(Path(config_path).read_text())
     else:
-        config = HttpServiceConfig.from_env()
+        config = HttpServiceConfig()
     app = GunicornApp.from_config(config)
     app.run()
 

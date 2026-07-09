@@ -7,14 +7,18 @@ import os
 import traceback
 import uuid
 from abc import ABC
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, NoReturn, Optional, Union
+from typing import Any, NoReturn, Union
 
-from icij_common.pydantic_utils import ICIJModel, safe_copy
+from icij_common.pydantic_utils import (
+    icij_config,
+    merge_configs,
+    safe_copy,
+)
 from icij_worker import TaskState
-from icij_worker.objects import ErrorEvent, Registrable, Task, TaskError
-from icij_worker.typing_ import AbstractSetIntStr, DictStrAny, MappingIntStrAny
-from pydantic import parse_obj_as
+from pydantic import BaseModel as PydanticBaseModel
+from pydantic import TypeAdapter
 
 from passport_service.constants import GOTENBERG_SUPPORTED_EXTS
 
@@ -29,10 +33,14 @@ BoundingBox = tuple[float, float, float, float]
 logger = logging.getLogger(__name__)
 
 
-class DocMetadata(ICIJModel):
+class BaseModel(PydanticBaseModel, ABC):
+    model_config = merge_configs(icij_config())
+
+
+class DocMetadata(BaseModel):
     path: Path
     extension: str
-    pdf_path: Optional[Path] = None
+    pdf_path: Path | None = None
 
     def relative_to(self, *, data_dir: Path) -> DocMetadata:
         path = data_dir / self.path
@@ -51,7 +59,7 @@ def _id_title(title: str) -> str:
     return "".join(id_title)
 
 
-class Error(ICIJModel):
+class Error(BaseModel):
     id: str
     title: str
     detail: str
@@ -68,12 +76,12 @@ class Error(ICIJModel):
         return error
 
 
-class DetectionRequest(ICIJModel):
+class DetectionRequest(BaseModel):
     # noqa: UP007
     doc_path: Path
-    pdf_path: Optional[Path] = None
-    pages: Optional[list[Path]] = None
-    error: Optional[Error] = None
+    pdf_path: Path | None = None
+    pages: list[Path] | None = None
+    error: Error | None = None
 
     def relative_to(self, *, data_dir: Path | None, work_dir: Path) -> DetectionRequest:
         doc_path = data_dir / self.doc_path
@@ -103,21 +111,21 @@ class ProcessingReport(DetectionRequest):
         return relative
 
 
-class ProcessingResponse(ICIJModel):
-    detection_task_id: Optional[str]
+class ProcessingResponse(BaseModel):
+    detection_task_id: str | None
     reports: list[ProcessingReport]
 
 
-class ObjectDetection(ICIJModel):
+class ObjectDetection(BaseModel):
     # noqa: UP007
     class_id: str
     confidence: float
     box: BoundingBox
-    scale: Optional[float] = None
+    scale: float | None = None
 
 
-class MRZ(ICIJModel):
-    country: Optional[str] = None
+class MRZ(BaseModel):
+    country: str | None = None
     metadata: dict[str, Any]
 
     # TODO: add raw_text, country, date_of_birth, sex, names, check_date_of_birth...
@@ -132,22 +140,22 @@ class MRZ(ICIJModel):
 
 
 class Passport(ObjectDetection):
-    mrz: Optional[MRZ] = None
+    mrz: MRZ | None = None
 
     @classmethod
     def from_detection(cls, detection: ObjectDetection, mrz: MRZ = None) -> Passport:
-        return cls(**detection.dict(), mrz=mrz)
+        return cls(**detection.model_dump(), mrz=mrz)
 
 
-class DocPageDetection(ICIJModel):
+class DocPageDetection(BaseModel):
     page: int
     passports: list[Passport]
 
 
-class PassportDetection(ICIJModel):
+class PassportDetection(BaseModel):
     doc_path: Path
-    doc_pages: Optional[list[DocPageDetection]] = None
-    error: Optional[Error] = None
+    doc_pages: list[DocPageDetection] | None = None
+    error: Error | None = None
 
     def relative_to(self, *, data_dir: Path) -> PassportDetection:
         doc_path = self.doc_path.relative_to(data_dir)
@@ -159,19 +167,19 @@ def generate_task_id(task_name: str) -> str:
     return f"{task_name}-{uid.hex}"
 
 
-class TaskSearch(ICIJModel):
-    name: Optional[str] = None
-    status: Optional[Union[list[TaskState], TaskState]] = None
+class TaskSearch(BaseModel):
+    name: str | None = None
+    status: Union[list[TaskState], TaskState] | None = None
 
 
-class PreprocessingRequest(ICIJModel):
+class PreprocessingRequest(BaseModel):
     docs: list[DocMetadata]
     detection_args: dict[str, Any]
 
 
 class PreprocessingTaskRequest(PreprocessingRequest):
     docs: list[DocMetadata | Path] | Path
-    batch_size: Optional[int] = 64
+    batch_size: int | None = 64
     detection_args: dict[str, Any]
 
 
@@ -189,7 +197,9 @@ def as_doc_metadata(
     supported_ext: set[str] | None = None,
 ) -> list[DocMetadata]:
     if supported_ext is None:
-        from passport_service.core.preprocessing import SUPPORTED_DOC_EXTS
+        from passport_service.core.preprocessing import (  # noqa: PLC0415
+            SUPPORTED_DOC_EXTS,
+        )
 
         supported_ext = set(GOTENBERG_SUPPORTED_EXTS)
         supported_ext.update(SUPPORTED_DOC_EXTS)
@@ -218,6 +228,9 @@ def as_doc_metadata(
     return docs
 
 
+_LIST_OF_DOC_META_OR_PATH_TA = TypeAdapter(list[DocMetadata | Path])
+
+
 def parse_preprocessing_request(
     docs: str | list[dict | str], *, data_dir: Path
 ) -> list[DocMetadata]:
@@ -227,7 +240,7 @@ def parse_preprocessing_request(
         docs = as_doc_metadata(docs_dir, data_dir=data_dir)
         logger.debug("found %s and more ...", docs[:10])
         return docs
-    docs = parse_obj_as(list[DocMetadata | Path], docs)
+    docs = _LIST_OF_DOC_META_OR_PATH_TA.validate_python(docs)
     if not docs:
         return []
     if isinstance(docs[0], Path):
@@ -259,48 +272,7 @@ def _read_extension_from_meta(meta_path: Path) -> str | None:
     return None
 
 
-class PassportDetectionRequest(ICIJModel):
+class PassportDetectionRequest(BaseModel):
     inputs: list[DetectionRequest]
     model_path: Path
     read_mrz: bool = True
-
-
-# TODO: remove when switching to Pydantic v2. This class is copy of icij_worker.Task.
-#  FastAPI use a hack for Pydantic v1 and v2 compat. The problem is that this hack
-#  creates a brand new class from existing Pydantic models using the
-#  `create_cloned_field` function. Since a new task class if created the base class
-#  RegistrableMixing._registry is lost and all function which uses that registry fail.
-#  In particular icij_worker.Task.dict fails and hence the response serialization
-
-
-class _FastAPIRegistrableBugFix(Registrable, ICIJModel, ABC):
-    def dict(
-        self,
-        *,
-        include: AbstractSetIntStr | MappingIntStrAny | None = None,
-        exclude: AbstractSetIntStr | MappingIntStrAny | None = None,
-        by_alias: bool = False,
-        skip_defaults: bool | None = None,
-        exclude_unset: bool = False,
-        exclude_defaults: bool = False,
-        exclude_none: bool = False,
-    ) -> DictStrAny:
-        return super(Registrable, self).dict(
-            include=include,
-            exclude=exclude,
-            by_alias=by_alias,
-            skip_defaults=skip_defaults,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-        )
-
-
-class Task_(_FastAPIRegistrableBugFix, Task): ...  # noqa: N801
-
-
-class TaskError_(_FastAPIRegistrableBugFix, TaskError): ...  # noqa: N801
-
-
-class ErrorEvent_(_FastAPIRegistrableBugFix, ErrorEvent):  # noqa: N801
-    error: TaskError_

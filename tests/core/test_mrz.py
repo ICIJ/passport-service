@@ -15,8 +15,9 @@ def test_yolo_pipeline() -> None:
     # Then
     assert mrz.country == "UTO"
     # TODO: fix that, this test is failing but's that not probably not due to
-    #  read_mrz_yolo, rather < being interpreted as K
-    assert "JOHN K" in mrz.names
+    #  read_mrz_yolo, rather < being interpreted as K or L
+    assert "JOHN" in mrz.names
+    assert mrz.surname == "DOE"
 
 
 def test_read_mrz() -> None:

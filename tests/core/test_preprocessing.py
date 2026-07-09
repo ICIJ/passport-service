@@ -40,7 +40,7 @@ async def test_preprocess_docs(
     # Then
     docs = sorted(docs, key=lambda d: d.path)
     assert len(reports) == len(docs)
-    for doc, report in zip(docs, reports):
+    for doc, report in zip(docs, reports, strict=True):
         assert report.error is None
         assert report.doc_path == doc.path
         assert report.pages
