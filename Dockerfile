@@ -7,8 +7,10 @@ RUN apt-get update && apt-get install -y curl
 
 RUN curl -LsSf https://astral.sh/uv/0.5.6/install.sh | sh
 ENV PATH="$HOME/.local/bin:$PATH"
-ENV UV_LINK_MODE=copy
+ENV PYTHONUNBUFFERED=1
+ENV UV_HTTP_TIMEOUT=300
 ENV UV_COMPILE_BYTECODE=1
+ENV UV_NO_DEV=1
 
 ##### HTTP serivce
 FROM python-base AS passport-service
