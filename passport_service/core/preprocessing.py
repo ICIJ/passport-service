@@ -12,7 +12,7 @@ from icij_common.pydantic_utils import safe_copy
 from icij_worker.typing_ import RateProgress, RawProgress
 from icij_worker.utils.progress import to_raw_progress, to_scaled_progress
 from PIL import Image, UnidentifiedImageError
-from PIL.Image import EXTENSION
+from PIL.Image import registered_extensions
 from pymupdf import EmptyFileError, FileDataError
 
 from passport_service.utils import run_with_concurrency
@@ -263,7 +263,7 @@ def save_rgb_image(im: Image, page_path: Path) -> None:
 
 
 def should_convert_to_pdf(ext: str) -> bool:
-    if ext in EXTENSION:
+    if ext in registered_extensions():
         return False
     convert = ext in GOTENBERG_SUPPORTED_EXTS
     return convert
