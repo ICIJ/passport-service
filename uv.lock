@@ -1339,6 +1339,7 @@ gpu = [
 http = [
     { name = "fastapi" },
     { name = "gunicorn" },
+    { name = "tenacity" },
 ]
 inference = [
     { name = "numpy" },
@@ -1385,6 +1386,7 @@ requires-dist = [
     { name = "pycountry", marker = "extra == 'inference'", specifier = "~=23.12.11" },
     { name = "pymupdf", marker = "extra == 'preprocessing'", specifier = "~=1.24.7" },
     { name = "python-levenshtein", marker = "extra == 'inference'", specifier = "~=0.23.0" },
+    { name = "tenacity", marker = "extra == 'http'", specifier = "~=9.0.0" },
     { name = "tenacity", marker = "extra == 'inference'", specifier = "~=9.0.0" },
     { name = "tenacity", marker = "extra == 'preprocessing'", specifier = "~=9.0.0" },
 ]
