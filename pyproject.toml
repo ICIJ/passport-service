@@ -25,6 +25,9 @@ Repository = "https://github.com/ICIJ/passport-service"
 Issues = "https://github.com/ICIJ/passport-service/issues"
 
 [project.optional-dependencies]
+model-conversion = [
+    "onnx~=1.18",
+]
 http = [
     "fastapi~=0.111.1",
     "gunicorn~=22.0.0",
