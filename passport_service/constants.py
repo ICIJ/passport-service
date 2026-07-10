@@ -1,8 +1,8 @@
-from enum import Enum, unique
+from enum import StrEnum, unique
 
 
 @unique
-class Colorspace(str, Enum):
+class Colorspace(StrEnum):
     RGB = "RGB"
     GRAY = "GRAY"
 

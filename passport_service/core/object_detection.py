@@ -85,9 +85,18 @@ async def detect_passports(
     n_pages = 0
     for n_batch, batch in enumerate(pages_it):
         n_pages += len(batch)
-        preprocessed = (
-            preprocess_image(cv2.imread(str(item.page_path))) for item in batch
-        )
+        preprocessed = []
+        for item in batch:
+            if not Path(item.page_path).exists():
+                logger.error("%s preprocessed image does not exist!", item.page_path)
+            im = cv2.imread(str(item.page_path))
+            if im is None:
+                logger.error("%s preprocessed image couldn't be read!", item.page_path)
+                detection = PassportDetection(
+                    doc_path=Path(item.doc_path), doc_pages=item.pages, error=item.error
+                )
+                yield detection
+            preprocessed.append(preprocess_image(im))
         pages, blobs, scales = zip(*preprocessed, strict=True)
         batch_inputs = list(zip(blobs, scales, strict=True))
         passports_per_page = zip(
