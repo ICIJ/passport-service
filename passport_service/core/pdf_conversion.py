@@ -16,7 +16,6 @@ from aiohttp import (
     ServerTimeoutError,
 )
 from aiohttp.client_exceptions import ClientConnectionResetError
-from PIL.Image import EXTENSION
 from tenacity import (
     AsyncRetrying,
     RetryCallState,
@@ -122,10 +121,3 @@ class GotenbergClient:
         if isinstance(exc, ClientResponseError) and exc.status in _RETRIED_STATUSES:
             return True
         return isinstance(exc, _RETRIED_HTTP_EXCEPTIONS)
-
-
-def should_convert_to_pdf(ext: str) -> bool:
-    if ext in EXTENSION:
-        return False
-    convert = ext in GOTENBERG_SUPPORTED_EXTS
-    return convert

@@ -12,14 +12,22 @@ from icij_common.pydantic_utils import safe_copy
 from icij_worker.typing_ import RateProgress, RawProgress
 from icij_worker.utils.progress import to_raw_progress, to_scaled_progress
 from PIL import Image, UnidentifiedImageError
+from PIL.Image import EXTENSION
 from pymupdf import EmptyFileError, FileDataError
 
 from passport_service.utils import run_with_concurrency
 
-from ..constants import COLOR_LUT, PDF_EXT, PIL_PNG, PNG_EXT, Colorspace
+from ..constants import (
+    COLOR_LUT,
+    GOTENBERG_SUPPORTED_EXTS,
+    PDF_EXT,
+    PIL_PNG,
+    PNG_EXT,
+    Colorspace,
+)
 from ..exceptions import InvalidImage, InvalidPDF, UnsupportedDocExtension
 from ..objects import DocMetadata, Error, ProcessingReport
-from .pdf_conversion import GotenbergClient, should_convert_to_pdf
+from .pdf_conversion import GotenbergClient
 
 DEFAULT_DOC_PROCESSING_BATCH_SIZE = 10
 
@@ -252,3 +260,10 @@ def save_rgb_image(im: Image, page_path: Path) -> None:
     if im.mode != "RGB":
         im = im.convert("RGB")
     im.save(page_path, PIL_PNG)
+
+
+def should_convert_to_pdf(ext: str) -> bool:
+    if ext in EXTENSION:
+        return False
+    convert = ext in GOTENBERG_SUPPORTED_EXTS
+    return convert

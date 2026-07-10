@@ -8,7 +8,7 @@ from passport_service.config import AppConfig
 
 try:
     from passport_service.core.pdf_conversion import GotenbergClient
-except ImportError:
+except ImportError as e:
     GotenbergClient = None
 
 try:
