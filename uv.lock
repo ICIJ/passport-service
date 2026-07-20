@@ -696,6 +696,94 @@ wheels = [
 ]
 
 [[package]]
+name = "icij-passport-core"
+source = { editable = "." }
+dependencies = [
+    { name = "aiostream" },
+]
+
+[package.optional-dependencies]
+cpu = [
+    { name = "onnxruntime" },
+]
+gpu = [
+    { name = "onnxruntime-gpu" },
+]
+http = [
+    { name = "aiohttp" },
+    { name = "fastapi" },
+    { name = "gunicorn" },
+    { name = "tenacity" },
+]
+inference = [
+    { name = "numpy" },
+    { name = "opencv-python" },
+    { name = "passporteye" },
+    { name = "pillow" },
+    { name = "pycountry" },
+    { name = "python-levenshtein" },
+    { name = "tenacity" },
+]
+model-conversion = [
+    { name = "onnx", version = "1.19.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
+    { name = "onnx", version = "1.21.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+]
+preprocessing = [
+    { name = "passporteye" },
+    { name = "pillow" },
+    { name = "pymupdf" },
+    { name = "tenacity" },
+]
+worker = [
+    { name = "aio-pika" },
+    { name = "aiormq" },
+    { name = "icij-worker", extra = ["amqp", "postgres"] },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "pylint" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aio-pika", marker = "extra == 'worker'", specifier = "==9.4.2" },
+    { name = "aiohttp", marker = "extra == 'http'", specifier = "~=3.10.10" },
+    { name = "aiormq", marker = "extra == 'worker'", specifier = "==6.8.0" },
+    { name = "aiostream", specifier = "~=0.6" },
+    { name = "fastapi", marker = "extra == 'http'", specifier = "~=0.111.1" },
+    { name = "gunicorn", marker = "extra == 'http'", specifier = "~=22.0.0" },
+    { name = "icij-worker", extras = ["amqp", "postgres"], marker = "extra == 'worker'", specifier = "~=0.19.4" },
+    { name = "numpy", marker = "extra == 'inference'", specifier = "~=1.26.4" },
+    { name = "onnx", marker = "extra == 'model-conversion'", specifier = "~=1.18" },
+    { name = "onnxruntime", marker = "extra == 'cpu'", specifier = "~=1.18.1" },
+    { name = "onnxruntime-gpu", marker = "extra == 'gpu'", specifier = "~=1.18.1", index = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/" },
+    { name = "opencv-python", marker = "extra == 'inference'", specifier = "~=4.10.0.84" },
+    { name = "passporteye", marker = "extra == 'inference'", specifier = "~=2.2.1" },
+    { name = "passporteye", marker = "extra == 'preprocessing'", specifier = "~=2.2.1" },
+    { name = "pillow", marker = "extra == 'inference'", specifier = "~=9.4.0" },
+    { name = "pillow", marker = "extra == 'preprocessing'", specifier = "~=9.4.0" },
+    { name = "pycountry", marker = "extra == 'inference'", specifier = "~=23.12.11" },
+    { name = "pymupdf", marker = "extra == 'preprocessing'", specifier = "~=1.24.7" },
+    { name = "python-levenshtein", marker = "extra == 'inference'", specifier = "~=0.23.0" },
+    { name = "tenacity", marker = "extra == 'http'", specifier = "~=9.0.0" },
+    { name = "tenacity", marker = "extra == 'inference'", specifier = "~=9.0.0" },
+    { name = "tenacity", marker = "extra == 'preprocessing'", specifier = "~=9.0.0" },
+]
+provides-extras = ["cpu", "gpu", "http", "inference", "model-conversion", "preprocessing", "worker"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black", specifier = "~=24.4.2" },
+    { name = "pylint", specifier = "~=2.15.10" },
+    { name = "pytest", specifier = "~=8.2.2" },
+    { name = "pytest-asyncio", specifier = "~=0.21.1" },
+]
+
+[[package]]
 name = "icij-worker"
 version = "0.19.4"
 source = { registry = "https://pypi.org/simple" }
@@ -1508,95 +1596,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/fb/62/35bbd3d3021e008606cd0a9532db7850c65741bbf69ac8a3a0d8cfeb7934/pamqp-3.3.0.tar.gz", hash = "sha256:40b8795bd4efcf2b0f8821c1de83d12ca16d5760f4507836267fd7a02b06763b", size = 30993, upload-time = "2024-01-12T20:37:25.085Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ac/8d/c1e93296e109a320e508e38118cf7d1fc2a4d1c2ec64de78565b3c445eb5/pamqp-3.3.0-py2.py3-none-any.whl", hash = "sha256:c901a684794157ae39b52cbf700db8c9aae7a470f13528b9d7b4e5f7202f8eb0", size = 33848, upload-time = "2024-01-12T20:37:21.359Z" },
-]
-
-[[package]]
-name = "passport-service"
-version = "0.7.5"
-source = { editable = "." }
-dependencies = [
-    { name = "aio-pika" },
-    { name = "aiohttp" },
-    { name = "aiormq" },
-    { name = "aiostream" },
-    { name = "fastapi" },
-    { name = "icij-worker", extra = ["amqp", "postgres"] },
-]
-
-[package.optional-dependencies]
-cpu = [
-    { name = "onnxruntime" },
-]
-gpu = [
-    { name = "onnxruntime-gpu" },
-]
-http = [
-    { name = "fastapi" },
-    { name = "gunicorn" },
-    { name = "tenacity" },
-]
-inference = [
-    { name = "numpy" },
-    { name = "opencv-python" },
-    { name = "passporteye" },
-    { name = "pillow" },
-    { name = "pycountry" },
-    { name = "python-levenshtein" },
-    { name = "tenacity" },
-]
-model-conversion = [
-    { name = "onnx", version = "1.19.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
-    { name = "onnx", version = "1.21.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
-]
-preprocessing = [
-    { name = "passporteye" },
-    { name = "pillow" },
-    { name = "pymupdf" },
-    { name = "tenacity" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "black" },
-    { name = "pylint" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aio-pika", specifier = "==9.4.2" },
-    { name = "aiohttp", specifier = "~=3.10.10" },
-    { name = "aiormq", specifier = "==6.8.0" },
-    { name = "aiostream", specifier = "~=0.6.1" },
-    { name = "fastapi", specifier = ">=0.111.1" },
-    { name = "fastapi", marker = "extra == 'http'", specifier = "~=0.111.1" },
-    { name = "gunicorn", marker = "extra == 'http'", specifier = "~=22.0.0" },
-    { name = "icij-worker", extras = ["amqp", "postgres"], specifier = "~=0.19.4" },
-    { name = "numpy", marker = "extra == 'inference'", specifier = "~=1.26.4" },
-    { name = "onnx", marker = "extra == 'model-conversion'", specifier = "~=1.18" },
-    { name = "onnxruntime", marker = "extra == 'cpu'", specifier = "~=1.18.1" },
-    { name = "onnxruntime-gpu", marker = "extra == 'gpu'", specifier = "~=1.18.1", index = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/" },
-    { name = "opencv-python", marker = "extra == 'inference'", specifier = "~=4.10.0.84" },
-    { name = "passporteye", marker = "extra == 'inference'", specifier = "~=2.2.1" },
-    { name = "passporteye", marker = "extra == 'preprocessing'", specifier = "~=2.2.1" },
-    { name = "pillow", marker = "extra == 'inference'", specifier = "~=9.4.0" },
-    { name = "pillow", marker = "extra == 'preprocessing'", specifier = "~=9.4.0" },
-    { name = "pycountry", marker = "extra == 'inference'", specifier = "~=23.12.11" },
-    { name = "pymupdf", marker = "extra == 'preprocessing'", specifier = "~=1.24.7" },
-    { name = "python-levenshtein", marker = "extra == 'inference'", specifier = "~=0.23.0" },
-    { name = "tenacity", marker = "extra == 'http'", specifier = "~=9.0.0" },
-    { name = "tenacity", marker = "extra == 'inference'", specifier = "~=9.0.0" },
-    { name = "tenacity", marker = "extra == 'preprocessing'", specifier = "~=9.0.0" },
-]
-provides-extras = ["model-conversion", "http", "inference", "gpu", "cpu", "preprocessing"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "black", specifier = "~=24.4.2" },
-    { name = "pylint", specifier = "~=2.15.10" },
-    { name = "pytest", specifier = "~=8.2.2" },
-    { name = "pytest-asyncio", specifier = "~=0.21.1" },
 ]
 
 [[package]]
