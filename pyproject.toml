@@ -1,23 +1,15 @@
 [project]
-name = "passport-service"
-version = "0.7.7"
-description = "Passport detection service"
+name = "icij-passport-core"
+dynamic = ["version"]
+description = "Passport detection"
 authors = [
-    { name = "Clément Doumouro", email = "cdoumouro@icij.org" },
+  { name = "Clément Doumouro", email = "cdoumouro@icij.org" },
 ]
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 dependencies = [
-    "aiostream~=0.6.1",
-    "aiohttp~=3.10.10",
-    "icij-worker[amqp,postgres]~=0.19.4",
-    "aio-pika==9.4.2",
-    "aiormq==6.8.0",
-    "fastapi>=0.111.1",
+  "aiostream~=0.6",
 ]
-
-[tool.setuptools]
-packages = ["passport_service"]
 
 [project.urls]
 Homepage = "https://github.com/ICIJ/passport-service"
@@ -26,35 +18,41 @@ Issues = "https://github.com/ICIJ/passport-service/issues"
 
 [project.optional-dependencies]
 model-conversion = [
-    "onnx~=1.18",
+  "onnx~=1.18",
+]
+worker = [
+  "icij-worker[amqp,postgres]~=0.19.4",
+  "aio-pika==9.4.2",
+  "aiormq==6.8.0",
 ]
 http = [
-    "fastapi~=0.111.1",
-    "gunicorn~=22.0.0",
-    "tenacity~=9.0.0",
+  "aiohttp~=3.10.10",
+  "fastapi~=0.111.1",
+  "gunicorn~=22.0.0",
+  "tenacity~=9.0.0",
 ]
 inference = [
-    "numpy~=1.26.4",
-    "opencv-python~=4.10.0.84",
-    "passporteye~=2.2.1",
-    "pillow~=9.4.0",
-    "pycountry~=23.12.11",
-    "python-levenshtein~=0.23.0",
-    # TODO: to avoid this, we need to conditionnally bypass the gotemberg client creation and hence need to read the
-    # worker group in the deps workflow
-    "tenacity~=9.0.0",
+  "numpy~=1.26.4",
+  "opencv-python~=4.10.0.84",
+  "passporteye~=2.2.1",
+  "pillow~=9.4.0",
+  "pycountry~=23.12.11",
+  "python-levenshtein~=0.23.0",
+  # TODO: to avoid this, we need to conditionnally bypass the gotemberg client creation and hence need to read the
+  # worker group in the deps workflow
+  "tenacity~=9.0.0",
 ]
 gpu = [
-    "onnxruntime-gpu~=1.18.1",
+  "onnxruntime-gpu~=1.18.1",
 ]
 cpu = [
-    "onnxruntime~=1.18.1",
+  "onnxruntime~=1.18.1",
 ]
 preprocessing = [
-    "passporteye~=2.2.1",
-    "pillow~=9.4.0",
-    "pymupdf~=1.24.7",
-    "tenacity~=9.0.0",
+  "passporteye~=2.2.1",
+  "pillow~=9.4.0",
+  "pymupdf~=1.24.7",
+  "tenacity~=9.0.0",
 ]
 
 [[tool.uv.index]]
@@ -67,20 +65,44 @@ onnxruntime-gpu = { index = "onnx-cuda12-nightly" }
 
 [dependency-groups]
 dev = [
-    "black~=24.4.2",
-    "pylint~=2.15.10",
-    "pytest~=8.2.2",
-    "pytest-asyncio~=0.21.1",
+  "black~=24.4.2",
+  "pylint~=2.15.10",
+  "pytest~=8.2.2",
+  "pytest-asyncio~=0.21.1",
 ]
 
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
 
-[tool.commitizen]
-version_provider = "pep621"
-name = "cz_conventional_commits"
-tag_format = "v$version"
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+fallback-version = "0.0.0"
+pattern = "default-unprefixed"
+
+[tool.hatch.build.targets.wheel]
+only-include = [
+  "passport_service/core",
+  "passport_service/__init__.py",
+  "passport_service/constants.py",
+  "passport_service/exceptions.py",
+  "passport_service/objects.py",
+  "passport_service/typing_.py",
+  "passport_service/utils.py",
+]
+
+[tool.hatch.build.targets.sdist]
+only-include = [
+  "passport_service/core",
+  "passport_service/__init__.py",
+  "passport_service/constants.py",
+  "passport_service/exceptions.py",
+  "passport_service/objects.py",
+  "passport_service/typing_.py",
+  "passport_service/utils.py",
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

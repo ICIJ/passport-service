@@ -23,12 +23,12 @@ RUN curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/relea
 RUN --mount=type=cache,target=~/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync -v --frozen --no-editable --no-install-project --extra http
+    uv sync -v --frozen --no-editable --no-install-project --extra http --extra worker
 # Then copy code
 ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
 # Then install service
-RUN cd passport_service && uv sync -v --frozen --no-editable --extra http
+RUN cd passport_service && uv sync -v --frozen --no-editable --extra http --extra worker
 RUN rm -rf ~/.cache/pip $(uv cache dir)
 
 ENTRYPOINT ["uv", "run", "python", "-m", "passport_service"]
@@ -46,13 +46,13 @@ ENV N_PROCESSING_WORKERS $n_workers
 RUN --mount=type=cache,target=~/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync -v --frozen --no-editable --no-install-project --extra preprocessing
+    uv sync -v --frozen --no-editable --no-install-project --extra preprocessing --extra worker
 # Then copy code
 ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
 ADD scripts  ./scripts/
 # Then install service
-RUN cd passport_service && uv sync -v --frozen --no-editable --extra preprocessing
+RUN cd passport_service && uv sync -v --frozen --no-editable --extra preprocessing --extra worker
 RUN rm -rf ~/.cache/pip $(uv cache dir)
 
 ENTRYPOINT ["/home/user/src/app/scripts/preprocessing_entrypoint.sh"]
@@ -76,12 +76,12 @@ RUN apt-get -y install cuda-toolkit-12-4 cudnn9-cuda-12
 RUN --mount=type=cache,target=~/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync -v --frozen --no-editable --no-install-project --extra inference --extra gpu
+    uv sync -v --frozen --no-editable --no-install-project --extra inference --extra gpu --extra worker
 # Then copy code
 ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
 # Then install service
-RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra gpu
+RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra gpu --extra worker
 RUN rm -rf ~/.cache/pip $(uv cache dir)
 ENTRYPOINT ["uv", "run", "python", "-m", "icij_worker", "workers", "start", "passport_service.app.app", "-g", "inference"]
 
@@ -90,9 +90,9 @@ FROM inference-base AS inference-worker-cpu
 RUN --mount=type=cache,target=~/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync -v --frozen --no-editable --no-install-project --extra inference --extra cpu
+    uv sync -v --frozen --no-editable --no-install-project --extra inference --extra cpu --extra worker
 ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
-RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra cpu
+RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra cpu --extra worker
 RUN rm -rf ~/.cache/pip $(uv cache dir)
 ENTRYPOINT ["uv", "run", "python", "-m", "icij_worker", "workers", "start", "passport_service.app.app", "-g", "inference"]
