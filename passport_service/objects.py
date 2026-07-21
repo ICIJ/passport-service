@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any, NoReturn, Union
 
 from icij_common.pydantic_utils import icij_config, merge_configs, safe_copy
-from icij_worker import TaskState
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import TypeAdapter
 
@@ -161,11 +160,6 @@ class PassportDetection(BaseModel):
 def generate_task_id(task_name: str) -> str:
     uid = uuid.uuid4()
     return f"{task_name}-{uid.hex}"
-
-
-class TaskSearch(BaseModel):
-    name: str | None = None
-    status: Union[list[TaskState], TaskState] | None = None
 
 
 class PreprocessingRequest(BaseModel):

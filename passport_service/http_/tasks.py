@@ -5,15 +5,20 @@ from fastapi import APIRouter, HTTPException
 from icij_common.logging_utils import TRACE, log_elapsed_time_cm
 from icij_worker import Task
 from icij_worker.exceptions import UnknownTask
-from icij_worker.objects import ErrorEvent
+from icij_worker.objects import ErrorEvent, TaskState
 from starlette.responses import Response
 from starlette.status import HTTP_204_NO_CONTENT
 
-from ..objects import BaseModel, TaskSearch
+from ..objects import BaseModel
 from .dependencies import lifespan_task_manager
 from .doc import TASKS_TAG
 
 logger = logging.getLogger(__name__)
+
+
+class TaskSearch(BaseModel):
+    name: str | None = None
+    status: list[TaskState] | TaskState | None = None
 
 
 def tasks_router() -> APIRouter:

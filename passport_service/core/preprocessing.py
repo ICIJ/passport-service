@@ -9,8 +9,6 @@ from pathlib import Path
 
 import pymupdf
 from icij_common.pydantic_utils import safe_copy
-from icij_worker.typing_ import RateProgress, RawProgress
-from icij_worker.utils.progress import to_raw_progress, to_scaled_progress
 from PIL import Image, UnidentifiedImageError
 from pymupdf import EmptyFileError, FileDataError
 
@@ -44,13 +42,6 @@ SUPPORTED_DOC_EXTS_LIST = sorted(SUPPORTED_DOC_EXTS)
 REPORTED_ERRORS = (UnsupportedDocExtension, InvalidPDF)
 
 
-def _scale_pdf_progress(
-    progress: RateProgress, *, n_pdfs: int, pdf_processing_end: float
-) -> RawProgress:
-    progress = to_scaled_progress(progress, end=pdf_processing_end)
-    return to_raw_progress(progress, max_progress=n_pdfs)
-
-
 async def preprocess_docs(
     docs_metadata: list[DocMetadata],
     output_dir: Path,
@@ -61,7 +52,6 @@ async def preprocess_docs(
     pdf_conversion_concurrency: int = 2,
     # TODO: use an enum here ?
     colorspace: Colorspace = Colorspace.RGB,
-    progress: RateProgress | None = None,
 ) -> AsyncGenerator[ProcessingReport, None]:
     n_processes = executor._max_workers
     # TODO: remove this when a proper PDF service is running
@@ -79,13 +69,6 @@ async def preprocess_docs(
     base_pdf_processing_end = 0.8 if to_convert_to_pdf else 0.0
     pdf_processing_end = base_pdf_processing_end * base_pdf_processing_end
     if to_convert_to_pdf:
-        pdf_progress = None
-        if progress is not None:
-            pdf_progress = _scale_pdf_progress(
-                progress,
-                n_pdfs=len(to_convert_to_pdf),
-                pdf_processing_end=pdf_processing_end,
-            )
         logger.debug("Convert %s docs to PDF...", len(to_convert_to_pdf))
         n_pdf = 0
         pdf_it = _convert_to_pdf(
@@ -100,11 +83,6 @@ async def preprocess_docs(
                 docs_metadata[doc_i], update={"pdf_path": pdf_path}
             )
             n_pdf += 1
-            if pdf_progress is not None:
-                await pdf_progress(n_pdf)
-    if progress is not None:
-        progress = to_scaled_progress(progress, start=pdf_processing_end, end=1.0)
-        progress = to_raw_progress(progress, len(docs_metadata))
     chunk_size = (
         1
         if n_docs < n_processes * preprocessing_batch_size
@@ -113,15 +91,8 @@ async def preprocess_docs(
     process_doc_fn = partial(
         preprocess_doc, output_dir=output_dir, colorspace=colorspace
     )
-    n_processed = 0
-    update_progress_every = 5
     for report in executor.map(process_doc_fn, docs_metadata, chunksize=chunk_size):
         yield report
-        n_processed += 1
-        if progress and not n_processed % update_progress_every:
-            progress(n_processed)
-    if progress and n_processed % update_progress_every:
-        progress(n_processed)
 
 
 def preprocess_doc(
