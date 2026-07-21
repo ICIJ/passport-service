@@ -7,9 +7,17 @@ try:
 except ModuleNotFoundError:
     GotenbergClient = None
 try:
-    from .preprocessing import preprocess_docs
+    from .preprocessing import (
+        preprocess_docs,
+        process_image,
+        process_pdf,
+        should_convert_to_pdf,
+    )
 except ModuleNotFoundError:
     preprocess_docs = None
+    process_image = None
+    process_pdf = None
+    should_convert_to_pdf = None
 
 try:
     from .mrz import read_passport_file_mrz
