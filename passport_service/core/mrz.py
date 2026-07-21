@@ -18,12 +18,11 @@ from passporteye.mrz.image import (
 )
 from passporteye.mrz.text import MRZ
 from passporteye.util.geometry import RotatedBox
-from passporteye.util.pipeline import Pipeline
 from pytesseract import pytesseract
 from skimage import morphology, transform
 
-from passport_service import DATA_DIR
-from passport_service.typing_ import PassportEyeMRZ
+from ..constants import DATA_DIR
+from ..typing_ import PassportEyeMRZ
 
 
 class BoxToMRZFixed(BoxToMRZ):
@@ -158,80 +157,6 @@ class MRZPipelineFixed(MRZPipeline):
         )
         self.add_component("other_max_width", TryOtherMaxWidth())
         self.add_component("extractor", ExtractAllBoxes())
-
-
-class MockProvider:
-    __depends__ = ["img"]
-    __provides__ = [
-        "img_small",
-        # We artificially provided this factor even if we don't scale as it's needed by
-        # the last pipeline steps
-        "scale_factor",
-    ]
-
-    def __call__(self, img: np.ndarray):
-        img_small = img
-        scale_factor = 1.0
-        return img_small, scale_factor
-
-
-class PassThroughBoxLocator:
-    # Return the full image as a MRZ box
-    __depends__ = ["img"]
-    __provides__ = [
-        # We artificially provided this factor even if we don't scale as it's needed by
-        # the last pipeline steps
-        "boxes",
-    ]
-
-    def __call__(self, img: np.ndarray):
-        # Return a single box encompassing the full image
-        # TODO: we assume the image was provided correctly rotated
-
-        height, width = img.shape
-        center = (height / 2, width / 2)
-        box = RotatedBox(center, width, height, np.pi / 2)
-        boxes = [box]
-        return boxes
-
-
-class YoloMRZPipeline(Pipeline):
-    # MRZ pipeline which skips MRZ
-    def __init__(self, file: str | Path, extra_cmdline_params: str = ""):
-        super().__init__()
-        self.version = "1.0"
-        if isinstance(file, Path):
-            file = str(file)
-        self.file = file
-        self.add_component("loader", Loader(file))
-        self.add_component("provided", MockProvider())
-        # We remove the boone transform since it was needed for box detection
-        # self.add_component("boone", BooneTransform())
-        self.add_component("box_locator", PassThroughBoxLocator())
-        # We keep this to avoid bugs
-        self.add_component(
-            "mrz", FindFirstValidMRZ(extra_cmdline_params=extra_cmdline_params)
-        )
-        # We keep this to avoid bugs
-        self.add_component("other_max_width", TryOtherMaxWidth())
-        self.add_component("extractor", ExtractAllBoxes())
-
-    @property
-    def result(self) -> MRZ:
-        return self["mrz_final"]
-
-
-def read_mrz_yolo(
-    file: BytesIO | Path | str,
-    extra_cmdline_params: str = "",
-    *,
-    save_roi: bool = False,
-) -> MRZ:
-    p = YoloMRZPipeline(file, extra_cmdline_params)
-    mrz = p.result
-    if mrz is not None and save_roi:
-        mrz.aux["roi"] = p["roi"]
-    return mrz
 
 
 def read_passport_file_mrz(

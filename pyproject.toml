@@ -6,9 +6,10 @@ authors = [
   { name = "Clément Doumouro", email = "cdoumouro@icij.org" },
 ]
 readme = "README.md"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.11,<3.14"
 dependencies = [
   "aiostream~=0.6",
+  "icij-common~=0.8.3"
 ]
 
 [project.urls]
@@ -21,7 +22,7 @@ model-conversion = [
   "onnx~=1.18",
 ]
 worker = [
-  "icij-worker[amqp,postgres]~=0.19.4",
+  "icij-worker[amqp,postgres]~=0.19.5",
   "aio-pika==9.4.2",
   "aiormq==6.8.0",
 ]
@@ -35,7 +36,7 @@ inference = [
   "numpy~=1.26.4",
   "opencv-python~=4.10.0.84",
   "passporteye~=2.2.1",
-  "pillow~=9.4.0",
+  "pillow~=10.2",
   "pycountry~=23.12.11",
   "python-levenshtein~=0.23.0",
   # TODO: to avoid this, we need to conditionnally bypass the gotemberg client creation and hence need to read the
@@ -50,7 +51,7 @@ cpu = [
 ]
 preprocessing = [
   "passporteye~=2.2.1",
-  "pillow~=9.4.0",
+  "pillow~=10.2",
   "pymupdf~=1.24.7",
   "tenacity~=9.0.0",
 ]
@@ -65,6 +66,7 @@ onnxruntime-gpu = { index = "onnx-cuda12-nightly" }
 
 [dependency-groups]
 dev = [
+  "aiohttp",
   "black~=24.4.2",
   "pylint~=2.15.10",
   "pytest~=8.2.2",

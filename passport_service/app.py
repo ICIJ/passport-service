@@ -4,7 +4,7 @@ from pathlib import Path
 from icij_worker import AsyncApp
 from pydantic import TypeAdapter
 
-from passport_service.constants import (
+from .constants import (
     CREATE_PREPROCESSING_TASKS_TASK,
     DETECT_PASSPORTS_TASKS,
     INFERENCE_GROUP,
@@ -12,12 +12,8 @@ from passport_service.constants import (
     PREPROCESSING_GROUP,
     Colorspace,
 )
-from passport_service.objects import (
-    DetectionRequest,
-    DocMetadata,
-    parse_preprocessing_request,
-)
-from passport_service.tasks.dependencies import (
+from .objects import DetectionRequest, DocMetadata, parse_preprocessing_request
+from .tasks.dependencies import (
     APP_LIFESPAN_DEPS,
     lifespan_config,
     lifespan_gotenberg_client,
@@ -93,12 +89,8 @@ _DETECTION_REQUEST_TASK = TypeAdapter(list[DetectionRequest])
 async def detect_passports(
     inputs: list[dict], model_path: Path, *, read_mrz: bool = True
 ) -> list[dict]:
-    from passport_service.core.object_detection import (  # noqa: PLC0415
-        inference_session,
-    )
-    from passport_service.tasks.inference import (  # noqa: PLC0415
-        passport_detection_task,
-    )
+    from .core.object_detection import inference_session  # noqa: PLC0415
+    from .tasks.inference import passport_detection_task  # noqa: PLC0415
 
     inputs = _DETECTION_REQUEST_TASK.validate_python(inputs)
     config = lifespan_config()

@@ -6,14 +6,14 @@ from icij_worker import Task
 from icij_worker.exceptions import TaskAlreadyQueued, TaskQueueIsFull
 from starlette.responses import Response
 
-from passport_service.constants import (
+from ..constants import (
     CREATE_PREPROCESSING_TASKS_TASK,
     DETECT_PASSPORTS_TASKS,
     PREPROCESS_DOCS_TASK,
 )
-from passport_service.http_ import PASSPORTS_TAG
-from passport_service.http_.dependencies import lifespan_task_manager
-from passport_service.objects import (
+from ..http_ import PASSPORTS_TAG
+from ..http_.dependencies import lifespan_task_manager
+from ..objects import (
     PassportDetectionRequest,
     PreprocessingRequest,
     PreprocessingTaskRequest,

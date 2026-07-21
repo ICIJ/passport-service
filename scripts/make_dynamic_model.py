@@ -7,13 +7,6 @@ from onnx.tools.update_model_dims import update_inputs_outputs_dims
 
 def make_dynamic_model(model_path: Path, *, output_path: Path) -> None:
     model = onnx.load(model_path)
-    names = [
-        (
-            inp.name,
-            [d.dim_value or d.dim_param for d in inp.type.tensor_type.shape.dim],
-        )
-        for inp in model.graph.input
-    ]
     input_dims = {
         i.name: [d.dim_value or d.dim_param for d in i.type.tensor_type.shape.dim]
         for i in model.graph.input

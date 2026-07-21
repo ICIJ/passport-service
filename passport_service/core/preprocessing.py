@@ -14,8 +14,6 @@ from icij_worker.utils.progress import to_raw_progress, to_scaled_progress
 from PIL import Image, UnidentifiedImageError
 from pymupdf import EmptyFileError, FileDataError
 
-from passport_service.utils import run_with_concurrency
-
 from ..constants import (
     COLOR_LUT,
     GOTENBERG_SUPPORTED_EXTS,
@@ -26,6 +24,7 @@ from ..constants import (
 )
 from ..exceptions import InvalidImage, InvalidPDF, UnsupportedDocExtension
 from ..objects import DocMetadata, Error, ProcessingReport
+from ..utils import run_with_concurrency
 from .pdf_conversion import GotenbergClient
 
 DEFAULT_DOC_PROCESSING_BATCH_SIZE = 10

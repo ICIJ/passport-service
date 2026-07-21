@@ -4,8 +4,8 @@ from pathlib import Path
 
 import onnxruntime
 
-from passport_service.core.object_detection import detect_passports
-from passport_service.objects import DetectionRequest, PassportDetection
+from ..core.object_detection import detect_passports
+from ..objects import DetectionRequest, PassportDetection
 
 logger = logging.getLogger(__name__)
 

@@ -10,15 +10,9 @@ from collections.abc import (
     Sequence,
 )
 from itertools import islice
-from pathlib import Path
-from typing import (
-    TypeVar,
-)
+from typing import TypeVar
 
 from aiostream.stream import flatten
-
-ROOT_DIR = Path(__file__).parent
-DATA_DIR = ROOT_DIR.joinpath("data")
 
 T = TypeVar("T")
 

@@ -10,12 +10,12 @@ from icij_common.fastapi_utils import (
 )
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from passport_service.config import HttpServiceConfig
-from passport_service.http_ import OTHER_TAG, PASSPORTS_TAG, TASKS_TAG
-from passport_service.http_.dependencies import run_http_service_deps
-from passport_service.http_.main import main_router
-from passport_service.http_.passports import passports_router
-from passport_service.http_.tasks import tasks_router
+from ..config import HttpServiceConfig
+from . import OTHER_TAG, PASSPORTS_TAG, TASKS_TAG
+from .dependencies import run_http_service_deps
+from .main import main_router
+from .passports import passports_router
+from .tasks import tasks_router
 
 INTERNAL_SERVER_ERROR = "Internal Server Error"
 _REQUEST_VALIDATION_ERROR = "Request Validation Error"

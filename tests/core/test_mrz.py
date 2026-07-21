@@ -1,23 +1,9 @@
 from pathlib import Path
 
-from passport_service.core.mrz import read_mrz_yolo, read_passport_file_mrz
+from passport_service.core.mrz import read_passport_file_mrz
 from tests import TEST_DATA_DIR
 
 TEST_DIR = Path(__file__).parent.joinpath("data")
-
-
-def test_yolo_pipeline() -> None:
-    # Given
-    test_image_path = TEST_DATA_DIR / "test_yolo_mrz.jpeg"
-
-    # When
-    mrz = read_mrz_yolo(test_image_path)
-    # Then
-    assert mrz.country == "UTO"
-    # TODO: fix that, this test is failing but's that not probably not due to
-    #  read_mrz_yolo, rather < being interpreted as K or L
-    assert "JOHN" in mrz.names
-    assert mrz.surname == "DOE"
 
 
 def test_read_mrz() -> None:

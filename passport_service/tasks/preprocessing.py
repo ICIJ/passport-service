@@ -3,16 +3,12 @@ from concurrent.futures import ProcessPoolExecutor
 from copy import deepcopy
 from pathlib import Path
 
-from passport_service.constants import (
-    DETECT_PASSPORTS_TASKS,
-    PREPROCESS_DOCS_TASK,
-    Colorspace,
-)
-from passport_service.core.pdf_conversion import GotenbergClient
-from passport_service.core.preprocessing import preprocess_docs
-from passport_service.http_ import TaskClient
-from passport_service.objects import DocMetadata, ProcessingResponse
-from passport_service.utils import batches
+from ..constants import DETECT_PASSPORTS_TASKS, PREPROCESS_DOCS_TASK, Colorspace
+from ..core.pdf_conversion import GotenbergClient
+from ..core.preprocessing import preprocess_docs
+from ..http_ import TaskClient
+from ..objects import DocMetadata, ProcessingResponse
+from ..utils import batches
 
 logger = logging.getLogger(__name__)
 

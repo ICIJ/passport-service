@@ -12,12 +12,8 @@ from icij_worker.utils.logging_ import LogWithWorkerIDMixin
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
-from passport_service.objects import BaseModel
-
-try:
-    from passport_service.core.pdf_conversion import GotenbergClient
-except ImportError:
-    GotenbergClient = None
+from .core import GotenbergClient
+from .objects import BaseModel
 
 try:
     from passport_service.http_ import TaskClient

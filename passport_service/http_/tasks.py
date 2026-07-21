@@ -9,9 +9,9 @@ from icij_worker.objects import ErrorEvent
 from starlette.responses import Response
 from starlette.status import HTTP_204_NO_CONTENT
 
-from passport_service.http_.dependencies import lifespan_task_manager
-from passport_service.http_.doc import TASKS_TAG
-from passport_service.objects import BaseModel, TaskSearch
+from ..objects import BaseModel, TaskSearch
+from .dependencies import lifespan_task_manager
+from .doc import TASKS_TAG
 
 logger = logging.getLogger(__name__)
 

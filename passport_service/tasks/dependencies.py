@@ -4,15 +4,15 @@ from multiprocessing.pool import Pool
 from icij_worker import WorkerConfig
 from icij_worker.utils.dependencies import DependencyInjectionError
 
-from passport_service.config import AppConfig
+from ..config import AppConfig
 
 try:
-    from passport_service.core.pdf_conversion import GotenbergClient
+    from ..core.pdf_conversion import GotenbergClient
 except ImportError:
     GotenbergClient = None
 
 try:
-    from passport_service.http_ import TaskClient
+    from ..http_ import TaskClient
 except ImportError:
     TaskClient = None
 

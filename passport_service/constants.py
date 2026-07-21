@@ -1,8 +1,12 @@
-from enum import Enum, unique
+from enum import StrEnum, unique
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).parent
+DATA_DIR = ROOT_DIR.joinpath("data")
 
 
 @unique
-class Colorspace(str, Enum):
+class Colorspace(StrEnum):
     RGB = "RGB"
     GRAY = "GRAY"
 

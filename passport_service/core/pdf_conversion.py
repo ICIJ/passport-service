@@ -25,13 +25,13 @@ from tenacity import (
 )
 from tenacity.wait import wait_base, wait_random
 
-from passport_service.constants import (
+from ..constants import (
     GOTENBERG_LIBREOFFICE_EXTS,
     GOTENBERG_SUPPORTED_EXTS,
     HTML_EXT,
     MARKDOWN_EXT,
 )
-from passport_service.exceptions import UnsupportedDocExtension
+from ..exceptions import UnsupportedDocExtension
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.10-slim-bullseye AS python-base
+FROM python:3.12-slim-bullseye AS python-base
 
 ENV HOME=/home/user
 WORKDIR $HOME

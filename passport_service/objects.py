@@ -11,11 +11,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, NoReturn, Union
 
-from icij_common.pydantic_utils import (
-    icij_config,
-    merge_configs,
-    safe_copy,
-)
+from icij_common.pydantic_utils import icij_config, merge_configs, safe_copy
 from icij_worker import TaskState
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import TypeAdapter

@@ -9,9 +9,8 @@ from fastapi import FastAPI, Path
 from gunicorn.app.base import BaseApplication
 from icij_common.logging_utils import setup_loggers
 
-import passport_service
-from passport_service.config import HttpServiceConfig
-from passport_service.http_.service import create_service
+from ..config import HttpServiceConfig
+from ..http_.service import create_service
 
 
 class Formatter(argparse.ArgumentDefaultsHelpFormatter):
@@ -65,7 +64,7 @@ def get_arg_parser() -> argparse.ArgumentParser:
 def main() -> None:
     # Setup loggers temporarily before loggers init using the app configuration
 
-    setup_loggers(["__main__", passport_service.__name__])
+    setup_loggers(["__main__", "passport_service"])
     logger = logging.getLogger(__name__)
     try:
         arg_parser = get_arg_parser()
