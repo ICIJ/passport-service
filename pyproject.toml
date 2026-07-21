@@ -27,7 +27,7 @@ worker = [
   "aiormq==6.8.0",
 ]
 http = [
-  "aiohttp~=3.10.10",
+  "aiohttp~=3.10",
   "fastapi~=0.111.1",
   "gunicorn~=22.0.0",
   "tenacity~=9.0.0",
@@ -50,7 +50,7 @@ cpu = [
   "onnxruntime~=1.18.1",
 ]
 preprocessing = [
-  "aiohttp~=3.10.10",
+  "aiohttp~=3.10",
   "pillow~=10.2",
   "pymupdf~=1.24.7",
   "tenacity~=9.0.0",
