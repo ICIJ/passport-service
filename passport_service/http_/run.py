@@ -9,7 +9,7 @@ from fastapi import FastAPI, Path
 from gunicorn.app.base import BaseApplication
 from icij_common.logging_utils import setup_loggers
 
-from ..config import HttpServiceConfig
+from .config import HttpServiceConfig
 from ..http_.service import create_service
 
 

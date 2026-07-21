@@ -13,7 +13,7 @@ from multidict import CIMultiDict, CIMultiDictProxy
 from pymupdf import pymupdf
 from yarl import URL
 
-from passport_service.config import AppConfig
+from passport_service.tasks.config import AppConfig
 from passport_service.core.pdf_conversion import GotenbergClient
 from tests import TEST_DATA_DIR
 

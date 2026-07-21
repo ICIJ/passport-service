@@ -10,7 +10,7 @@ from icij_common.fastapi_utils import (
 )
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from ..config import HttpServiceConfig
+from .config import HttpServiceConfig
 from . import OTHER_TAG, PASSPORTS_TAG, TASKS_TAG
 from .dependencies import run_http_service_deps
 from .main import main_router

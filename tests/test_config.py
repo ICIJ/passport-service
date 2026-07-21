@@ -2,7 +2,7 @@ import os
 
 from icij_worker.task_manager.amqp import AMQPTaskManagerConfig
 
-from passport_service.config import HttpServiceConfig
+from passport_service.http_.config import HttpServiceConfig
 
 
 def test_http_config_from_env(reset_env) -> None:  # noqa: ANN001, ARG001

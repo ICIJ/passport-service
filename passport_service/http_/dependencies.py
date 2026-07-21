@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from icij_worker import AMQPTaskManager
 from icij_worker.utils.dependencies import DependencyInjectionError, run_deps
 
-from ..config import HttpServiceConfig
+from .config import HttpServiceConfig
 
 _TASK_MANAGER: AMQPTaskManager | None = None
 _HTTP_SERVICE_CONFIG: HttpServiceConfig | None = None

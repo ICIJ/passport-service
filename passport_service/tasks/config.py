@@ -5,24 +5,17 @@ from multiprocessing import Pool
 from pathlib import Path
 from typing import ClassVar
 
-import icij_worker
-from icij_common.pydantic_utils import ICIJSettings, merge_configs
-from icij_worker.http_.config import HttpServiceConfig as BaseHttpServiceConfig
+from icij_common.pydantic_utils import ICIJSettings
 from icij_worker.utils.logging_ import LogWithWorkerIDMixin
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
-from .core import GotenbergClient
-from .objects import BaseModel
+from .. import DATA_DIR
+from ..core.pdf_conversion import GotenbergClient
+from ..http_ import TaskClient
+from ..objects import BaseModel
 
-try:
-    from passport_service.http_ import TaskClient
-except ImportError:
-    TaskClient = None
-
-import passport_service
-
-_ALL_LOGGERS = [passport_service.__name__, icij_worker.__name__]
+_ALL_LOGGERS = ["passport_service", "icij_worker"]
 
 
 class AppConfig(ICIJSettings, BaseModel, LogWithWorkerIDMixin):
@@ -62,7 +55,7 @@ class AppConfig(ICIJSettings, BaseModel, LogWithWorkerIDMixin):
     def countries(self) -> list[str]:
         if self.country_codes is not None:
             return self.country_codes
-        csv_path = passport_service.DATA_DIR / "default_country_codes.csv"
+        csv_path = DATA_DIR / "default_country_codes.csv"
         with csv_path.open() as csvfile:
             reader = csv.reader(csvfile)
             countries = [row[2] for row in reader]
@@ -81,17 +74,3 @@ class AppConfig(ICIJSettings, BaseModel, LogWithWorkerIDMixin):
     def to_task_client(self) -> TaskClient:
         client = TaskClient(self.http_service_address)
         return client
-
-
-class HttpServiceConfig(BaseHttpServiceConfig):
-    model_config = merge_configs(
-        BaseHttpServiceConfig.model_config,
-        SettingsConfigDict(
-            env_prefix="PASSPORT_HTTP_",
-            env_nested_delimiter="__",
-            nested_model_default_partial_update=True,
-            case_sensitive=False,
-        ),
-    )
-
-    gunicorn_workers: int = 1

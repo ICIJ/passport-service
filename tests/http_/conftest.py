@@ -10,7 +10,7 @@ from icij_worker.task_manager.amqp import AMQPTaskManagerConfig
 from psycopg import AsyncConnection
 from starlette.testclient import TestClient
 
-from passport_service.config import HttpServiceConfig
+from passport_service.http_.config import HttpServiceConfig
 from passport_service.http_.dependencies import lifespan_http_service_config
 from passport_service.http_.service import create_service
 from tests.conftest import (

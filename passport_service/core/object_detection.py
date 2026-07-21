@@ -18,8 +18,6 @@ import onnxruntime as rt
 import pycountry
 from cv2.dnn import NMSBoxes, blobFromImage
 from cv2.typing import MatLike
-from icij_worker.typing_ import RateProgress
-from icij_worker.utils.progress import to_raw_progress
 from onnxruntime import SessionOptions
 from PIL.Image import fromarray
 
@@ -63,7 +61,6 @@ async def detect_passports(
     classes: Sequence[str],
     read_mrz: bool,
     country_codes: list[str],
-    progress: RateProgress | None = None,
 ) -> AsyncGenerator[PassportDetection, None]:
     start_classif = time.process_time()
     n_inputs = len(inputs)
@@ -77,9 +74,6 @@ async def detect_passports(
     n_dropped = n_inputs - len(inputs)
     if n_dropped:
         logger.info("dropped %s documents due to preprocessing error !", n_dropped)
-    n_batches = n_inputs // batch_size
-    if progress is not None:
-        progress = to_raw_progress(progress, n_batches)
     pages_it = _batched_pages_it(inputs, batch_size)
     buffer = defaultdict(list)
     n_pages = 0
@@ -115,8 +109,6 @@ async def detect_passports(
         )
         for detection in detections:
             yield detection
-        if progress is not None:
-            await progress(n_batch)
     if buffer:
         msg = "inconsistent state: buffer was not emptied"
         msg += f"\nbuffer: {buffer}"

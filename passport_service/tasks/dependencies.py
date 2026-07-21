@@ -4,7 +4,7 @@ from multiprocessing.pool import Pool
 from icij_worker import WorkerConfig
 from icij_worker.utils.dependencies import DependencyInjectionError
 
-from ..config import AppConfig
+from .config import AppConfig
 
 try:
     from ..core.pdf_conversion import GotenbergClient
