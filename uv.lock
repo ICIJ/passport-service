@@ -641,7 +641,7 @@ model-conversion = [
     { name = "onnx", version = "1.21.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
 ]
 preprocessing = [
-    { name = "passporteye" },
+    { name = "aiohttp" },
     { name = "pillow" },
     { name = "pymupdf" },
     { name = "tenacity" },
@@ -665,6 +665,7 @@ dev = [
 requires-dist = [
     { name = "aio-pika", marker = "extra == 'worker'", specifier = "==9.4.2" },
     { name = "aiohttp", marker = "extra == 'http'", specifier = "~=3.10.10" },
+    { name = "aiohttp", marker = "extra == 'preprocessing'", specifier = "~=3.10.10" },
     { name = "aiormq", marker = "extra == 'worker'", specifier = "==6.8.0" },
     { name = "aiostream", specifier = "~=0.6" },
     { name = "fastapi", marker = "extra == 'http'", specifier = "~=0.111.1" },
@@ -677,7 +678,6 @@ requires-dist = [
     { name = "onnxruntime-gpu", marker = "extra == 'gpu'", specifier = "~=1.18.1", index = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/" },
     { name = "opencv-python", marker = "extra == 'inference'", specifier = "~=4.10.0.84" },
     { name = "passporteye", marker = "extra == 'inference'", specifier = "~=2.2.1" },
-    { name = "passporteye", marker = "extra == 'preprocessing'", specifier = "~=2.2.1" },
     { name = "pillow", marker = "extra == 'inference'", specifier = "~=10.2" },
     { name = "pillow", marker = "extra == 'preprocessing'", specifier = "~=10.2" },
     { name = "pycountry", marker = "extra == 'inference'", specifier = "~=23.12.11" },
@@ -708,6 +708,7 @@ dependencies = [
     { name = "typer" },
     { name = "typing-extensions" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/dc/27/58ec1d4ed597ed834188d8c9b0d905c59e2e2d7c5e016cacdb2fdfd67bd7/icij_worker-0.19.5.tar.gz", hash = "sha256:8c81f7a9b22e46cdcc9e507ecb61d6187168233a7d418e58b0cec5772485418e", size = 59798, upload-time = "2026-07-21T08:05:12.36Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ea/61/a287313013617f039676be82d8b69ccaac71555a7d8d304605b33cad0707/icij_worker-0.19.5-py3-none-any.whl", hash = "sha256:c910e47c928e52bab5a3321fd89516f09eeabe2fab4b5fbd2589bfd7934c2926", size = 85175, upload-time = "2026-07-21T08:05:11.366Z" },
 ]

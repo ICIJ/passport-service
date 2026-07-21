@@ -8,12 +8,14 @@ except ModuleNotFoundError:
     GotenbergClient = None
 try:
     from .preprocessing import (
+        get_pil_supported_extensions,
         preprocess_docs,
         process_image,
         process_pdf,
         should_convert_to_pdf,
     )
 except ModuleNotFoundError:
+    get_pil_supported_extensions = None
     preprocess_docs = None
     process_image = None
     process_pdf = None
@@ -22,11 +24,15 @@ except ModuleNotFoundError:
 try:
     from .mrz import read_passport_file_mrz
 except ModuleNotFoundError:
-    preprocess_docs = None
+    read_passport_file_mrz = None
 
 __all__ = [
     "GotenbergClient",
-    "detect_passports",
+    "get_pil_supported_extensions",
     "preprocess_docs",
+    "process_image",
+    "process_pdf",
+    "should_convert_to_pdf",
+    "detect_passports",
     "read_passport_file_mrz",
 ]
