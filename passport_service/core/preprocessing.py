@@ -20,7 +20,12 @@ from ..constants import (
     PNG_EXT,
     Colorspace,
 )
-from ..exceptions import InvalidImage, InvalidPDF, UnsupportedDocExtension
+from ..exceptions import (
+    InvalidDocument,
+    InvalidImage,
+    InvalidPDF,
+    UnsupportedDocExtension,
+)
 from ..objects import DocMetadata, Error, ProcessingReport
 from ..utils import run_with_concurrency
 from .pdf_conversion import GotenbergClient
@@ -39,7 +44,7 @@ PIL_SUPPORTED_EXTENSIONS = get_pil_supported_extensions()
 SUPPORTED_DOC_EXTS = set([PDF_EXT] + PIL_SUPPORTED_EXTENSIONS)
 SUPPORTED_DOC_EXTS_LIST = sorted(SUPPORTED_DOC_EXTS)
 
-REPORTED_ERRORS = (UnsupportedDocExtension, InvalidPDF)
+REPORTED_ERRORS = (UnsupportedDocExtension, InvalidDocument)
 
 
 async def preprocess_docs(
