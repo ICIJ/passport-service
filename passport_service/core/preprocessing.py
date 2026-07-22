@@ -147,9 +147,14 @@ def make_pdf_filename(source_path: Path) -> str:
 
 
 def process_pdf(
-    pdf_path: Path, *, output_dir: Path, colorspace: Colorspace
+    pdf_path: Path,
+    pdf_bytes: bytes | None = None,
+    *,
+    output_dir: Path,
+    colorspace: Colorspace,
 ) -> list[Path]:
-    pdf_bytes = pdf_path.read_bytes()
+    if pdf_bytes is None:
+        pdf_bytes = pdf_path.read_bytes()
     mode = COLOR_LUT[colorspace]
     pages = []
     try:
