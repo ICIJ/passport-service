@@ -9,7 +9,7 @@ import uuid
 from abc import ABC
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, NoReturn, Union
+from typing import Any, NoReturn
 
 from icij_common.pydantic_utils import icij_config, merge_configs, safe_copy
 from pydantic import BaseModel as PydanticBaseModel
@@ -55,7 +55,6 @@ def _id_title(title: str) -> str:
 
 
 class Error(BaseModel):
-    id: str
     title: str
     detail: str
 
@@ -66,8 +65,7 @@ class Error(BaseModel):
             None, value=exception, tb=exception.__traceback__
         )
         detail = f"{exception}\n{''.join(trace_lines)}"
-        error_id = f"{_id_title(title)}-{uuid.uuid4().hex}"
-        error = Error(id=error_id, title=title, detail=detail)
+        error = Error(title=title, detail=detail)
         return error
 
 
