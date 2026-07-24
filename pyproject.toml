@@ -93,6 +93,8 @@ only-include = [
   "passport_service/objects.py",
   "passport_service/typing_.py",
   "passport_service/utils.py",
+  "passport_service/data/default_country_codes.csv",
+  "passport_service/data/mrz.traineddata",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -104,6 +106,8 @@ only-include = [
   "passport_service/objects.py",
   "passport_service/typing_.py",
   "passport_service/utils.py",
+  "passport_service/data/default_country_codes.csv",
+  "passport_service/data/mrz.traineddata",
 ]
 
 [tool.pytest.ini_options]
