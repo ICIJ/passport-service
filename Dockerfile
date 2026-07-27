@@ -52,7 +52,7 @@ ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
 ADD scripts  ./scripts/
 # Then install service
-RUN cd passport_service && uv sync -v --frozen --no-editable --extra preprocessing --extra worker
+RUN cd passport_service && uv sync -v --frozen --no-editable --extra preprocessing --extra worker --extra http
 RUN rm -rf ~/.cache/pip $(uv cache dir)
 
 ENTRYPOINT ["/home/user/src/app/scripts/preprocessing_entrypoint.sh"]
@@ -76,7 +76,7 @@ RUN apt-get -y install cuda-toolkit-12-4 cudnn9-cuda-12
 RUN --mount=type=cache,target=~/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync -v --frozen --no-editable --no-install-project --extra inference --extra gpu --extra worker
+    uv sync -v --frozen --no-editable --no-install-project --extra inference --extra gpu --extra worker --extra http
 # Then copy code
 ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
