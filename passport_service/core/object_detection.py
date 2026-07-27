@@ -1,3 +1,4 @@
+import asyncio
 import gc
 import logging
 import re
@@ -77,7 +78,7 @@ async def detect_passports(
     pages_it = _batched_pages_it(inputs, batch_size)
     buffer = defaultdict(list)
     n_pages = 0
-    for n_batch, batch in enumerate(pages_it):
+    for batch in pages_it:
         n_pages += len(batch)
         preprocessed = []
         for item in batch:
@@ -93,17 +94,17 @@ async def detect_passports(
             preprocessed.append(preprocess_image(im))
         pages, blobs, scales = zip(*preprocessed, strict=True)
         batch_inputs = list(zip(blobs, scales, strict=True))
-        passports_per_page = zip(
-            pages, detect_objects(sess, batch_inputs, classes), strict=True
+        inference_res = await asyncio.to_thread(
+            detect_objects, sess, batch_inputs, classes
         )
+        passports_per_page = list(zip(pages, inference_res, strict=True))
         if read_mrz:
-            passports_per_page = (
-                [
-                    _add_mrzs(page, passport, country_codes=country_codes)
+            for page_i, (page, passports) in enumerate(passports_per_page):
+                passports = [  # noqa: PLW2901
+                    await _add_mrzs(page, passport, country_codes=country_codes)
                     for passport in passports
                 ]
-                for page, passports in passports_per_page
-            )
+                passports_per_page[page_i] = passports
         buffer, detections = _update_buffer(
             buffer, zip(batch, passports_per_page, strict=True)
         )
@@ -303,10 +304,12 @@ def read_passport_mrz(
     return mrz
 
 
-def _add_mrzs(
+async def _add_mrzs(
     page: np.array, passport: ObjectDetection, country_codes: list[str]
 ) -> Passport:
-    mrz = read_passport_mrz(page, passport, country_codes=country_codes)
+    mrz = await asyncio.to_thread(
+        read_passport_mrz, page, passport, country_codes=country_codes
+    )
     passport = Passport.from_detection(passport, mrz)
     return passport
 
