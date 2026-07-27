@@ -3,7 +3,7 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import cached_property
 from multiprocessing import Pool
 from pathlib import Path
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from icij_common.pydantic_utils import ICIJSettings
 from icij_worker.utils.logging_ import LogWithWorkerIDMixin
@@ -12,10 +12,12 @@ from pydantic_settings import SettingsConfigDict
 
 from .. import DATA_DIR
 from ..core.pdf_conversion import GotenbergClient
-from ..http_ import TaskClient
 from ..objects import BaseModel
 
 _ALL_LOGGERS = ["passport_service", "icij_worker"]
+
+if TYPE_CHECKING:
+    from ..http_ import TaskClient
 
 
 class AppConfig(ICIJSettings, BaseModel, LogWithWorkerIDMixin):
@@ -71,6 +73,8 @@ class AppConfig(ICIJSettings, BaseModel, LogWithWorkerIDMixin):
         )
         return client
 
-    def to_task_client(self) -> TaskClient:
+    def to_task_client(self) -> "TaskClient":
+        from ..http_ import TaskClient  # noqa: PLC0415
+
         client = TaskClient(self.http_service_address)
         return client

@@ -18,10 +18,10 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-_ASYNC_APP_CONFIG: AppConfig | None = None
-_PROCESS_POOL_EXECUTOR: Pool | None = None
-_GOTENBERG_CLIENT: GotenbergClient | None = None
-_TASK_CLIENT: TaskClient | None = None
+_ASYNC_APP_CONFIG: "AppConfig | None" = None
+_PROCESS_POOL_EXECUTOR: "Pool | None" = None
+_GOTENBERG_CLIENT: "GotenbergClient | None" = None
+_TASK_CLIENT: "TaskClient | None" = None
 
 
 def load_app_config(worker_config: WorkerConfig, **_) -> None:
