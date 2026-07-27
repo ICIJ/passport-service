@@ -5,7 +5,7 @@ ENV HOME=/home/user
 WORKDIR $HOME
 RUN apt-get update && apt-get install -y curl
 
-RUN curl -LsSf https://astral.sh/uv/0.5.6/install.sh | sh
+RUN curl -LsSf https://astral.sh/uv/0.11.6/install.sh | sh
 ENV PATH="$HOME/.local/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 ENV UV_HTTP_TIMEOUT=300
