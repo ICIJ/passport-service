@@ -81,7 +81,7 @@ RUN --mount=type=cache,target=~/.cache/uv \
 ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
 # Then install service
-RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra gpu --extra worker
+RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra gpu --extra worker --extra http
 RUN rm -rf ~/.cache/pip $(uv cache dir)
 ENTRYPOINT ["uv", "run", "python", "-m", "icij_worker", "workers", "start", "passport_service.app.app", "-g", "inference"]
 
@@ -90,9 +90,9 @@ FROM inference-base AS inference-worker-cpu
 RUN --mount=type=cache,target=~/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync -v --frozen --no-editable --no-install-project --extra inference --extra cpu --extra worker
+    uv sync -v --frozen --no-editable --no-install-project --extra inference --extra cpu --extra worker --extra http
 ADD uv.lock pyproject.toml README.md ./
 ADD passport_service  ./passport_service/
-RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra cpu --extra worker
+RUN cd passport_service && uv sync -v --frozen --no-editable --extra inference --extra cpu --extra worker --extra http
 RUN rm -rf ~/.cache/pip $(uv cache dir)
 ENTRYPOINT ["uv", "run", "python", "-m", "icij_worker", "workers", "start", "passport_service.app.app", "-g", "inference"]
