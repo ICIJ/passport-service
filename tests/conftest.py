@@ -15,8 +15,8 @@ from icij_worker import AMQPWorkerConfig, TaskState
 from starlette.testclient import TestClient
 
 from passport_service.app import app
-from passport_service.tasks.config import AppConfig
 from passport_service.core.pdf_conversion import GotenbergClient
+from passport_service.tasks.config import AppConfig
 from tests import TEST_DATA_DIR
 
 RABBITMQ_TEST_PORT = 5672

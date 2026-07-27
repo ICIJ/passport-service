@@ -6,7 +6,7 @@ authors = [
   { name = "Clément Doumouro", email = "cdoumouro@icij.org" },
 ]
 readme = "README.md"
-requires-python = ">=3.11,<3.14"
+requires-python = ">=3.10,<3.14"
 dependencies = [
   "aiostream~=0.6",
   "icij-common~=0.8.3"
@@ -19,7 +19,10 @@ Issues = "https://github.com/ICIJ/passport-service/issues"
 
 [project.optional-dependencies]
 model-conversion = [
-  "onnx~=1.18",
+  "onnx~=1.18.0",
+  "onnxscript~=0.5.0",
+  "torch~=1.13.1",
+  "ultralytics~=8.0.54",
 ]
 worker = [
   "icij-worker[amqp,postgres]~=0.19.5",
