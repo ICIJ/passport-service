@@ -782,7 +782,7 @@ requires-dist = [
     { name = "fastapi", marker = "extra == 'http'", specifier = "~=0.140.7" },
     { name = "gunicorn", marker = "extra == 'http'", specifier = "~=22.0.0" },
     { name = "icij-common", specifier = "~=0.8.3" },
-    { name = "icij-worker", extras = ["amqp", "postgres"], marker = "extra == 'worker'", specifier = "~=0.20.0" },
+    { name = "icij-worker", extras = ["amqp", "postgres"], marker = "extra == 'worker'", specifier = "~=0.20.1" },
     { name = "numpy", marker = "extra == 'inference'", specifier = "~=1.26.4" },
     { name = "onnx", marker = "extra == 'model-conversion'", specifier = "~=1.18.0" },
     { name = "onnxruntime", marker = "extra == 'cpu'", specifier = "~=1.18.1" },
@@ -816,7 +816,7 @@ dev = [
 
 [[package]]
 name = "icij-worker"
-version = "0.20.0"
+version = "0.20.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "alive-progress" },
@@ -824,9 +824,9 @@ dependencies = [
     { name = "typer" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/31/46/13462dffc9f6cc9cea3cfe38539b2371a6137e240fdafe7559ea2664ba05/icij_worker-0.20.0.tar.gz", hash = "sha256:4ae18243274651f205330eed7550519c21199938b8dfde45b564c3e43987a4bf", size = 59835, upload-time = "2026-07-28T08:51:16.352Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/52/17/45f7653a6a3c8bd522471534fb73c3141ed4efd7bf6dab2c83731b7a53da/icij_worker-0.20.1.tar.gz", hash = "sha256:7f5c5dfde79cd9dd08157845d9e16d505cfb71c0555771435ada5f58c77455a0", size = 59841, upload-time = "2026-07-28T09:22:56.787Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7a/61/a6660f4c1913cf90a64c19d67aca422c031676761acc683b7684a6d61859/icij_worker-0.20.0-py3-none-any.whl", hash = "sha256:f3e325a12a634d0a67baeae940bec2e6c534cb184a68d34c67e8495269207222", size = 85242, upload-time = "2026-07-28T08:51:15.309Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/c7/7c345ef04d568a3e0b32c1a8257d12098a8a30ac8ea0c52cefe4db0da42d/icij_worker-0.20.1-py3-none-any.whl", hash = "sha256:d5725819f3baf80ea162c5f8f37e8ee39d2727b962f38340539a74fd550ee4c4", size = 85289, upload-time = "2026-07-28T09:22:55.645Z" },
 ]
 
 [package.optional-dependencies]
