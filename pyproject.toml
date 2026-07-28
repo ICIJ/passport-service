@@ -25,13 +25,13 @@ model-conversion = [
   "ultralytics~=8.0.54",
 ]
 worker = [
-  "icij-worker[amqp,postgres]~=0.19.5",
+  "icij-worker[amqp,postgres]~=0.20.0",
   "aio-pika==9.4.2",
   "aiormq==6.8.0",
 ]
 http = [
   "aiohttp~=3.10",
-  "fastapi~=0.111.1",
+  "fastapi~=0.140.7",
   "gunicorn~=22.0.0",
   "tenacity~=9.0.0",
 ]
@@ -71,6 +71,7 @@ onnxruntime-gpu = { index = "onnx-cuda12-nightly" }
 dev = [
   "aiohttp",
   "black~=24.4.2",
+  "httpx2>=2.9.1",
   "pylint~=2.15.10",
   "pytest~=8.2.2",
   "pytest-asyncio~=0.21.1",

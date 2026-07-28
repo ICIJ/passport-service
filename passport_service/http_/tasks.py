@@ -1,4 +1,5 @@
 import logging
+from collections.abc import AsyncIterable
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -47,10 +48,9 @@ def tasks_router() -> APIRouter:
             with log_elapsed_time_cm(
                 logger, logging.INFO, "retrieved task in {elapsed_time} !"
             ):
-                task = await task_manager.get_task(task_id=task_id)
+                return await task_manager.get_task(task_id=task_id)
         except UnknownTask as e:
             raise HTTPException(status_code=404, detail=e.args[0]) from e
-        return Task(**task.model_dump())
 
     @router.get("/tasks/{task_id}")
     async def _get_task(task_id: str) -> Task:
@@ -86,16 +86,15 @@ def tasks_router() -> APIRouter:
             errors = await task_manager.get_task_errors(task_id=task_id)
         except UnknownTask as e:
             raise HTTPException(status_code=404, detail=e.args[0]) from e
-        errors = [ErrorEvent(**evt.model_dump()) for evt in errors]
         return errors
 
-    @router.post("/tasks", response_model=list[Task])
-    async def _search_tasks(search: TaskSearch) -> list[Task]:
+    @router.post("/tasks")
+    async def _search_tasks(search: TaskSearch) -> AsyncIterable[Task]:
         task_manager = lifespan_task_manager()
         with log_elapsed_time_cm(logger, TRACE, "Searched tasks in {elapsed_time} !"):
-            tasks = await task_manager.get_tasks(
+            async for t in task_manager.get_tasks(
                 group=None, task_type=search.name, status=search.status
-            )
-        return [Task(**t.model_dump()) for t in tasks]
+            ):
+                yield t
 
     return router
