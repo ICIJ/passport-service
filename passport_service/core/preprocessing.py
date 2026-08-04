@@ -140,7 +140,7 @@ def make_page_filename(parent_doc: Path, page: int) -> str:
     filename_without_ext, ext = os.path.splitext(parent_doc.name)
     if ext:
         ext = ext[1:]
-    return f"{parent_hash}_{filename_without_ext}_{ext}_page_{page}{PNG_EXT}'"
+    return f"{parent_hash}_{filename_without_ext}_{ext}_page_{page}{PNG_EXT}"
 
 
 def make_pdf_filename(source_path: Path) -> str:
