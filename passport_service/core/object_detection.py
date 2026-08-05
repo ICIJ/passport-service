@@ -22,7 +22,15 @@ from cv2.typing import MatLike
 from onnxruntime import SessionOptions
 from PIL.Image import fromarray
 
-from ..constants import COLOR_LUT, PIL_PNG, Colorspace
+from ..constants import (
+    COLOR_LUT,
+    DEFAULT_DETECTION_THRESHOLD,
+    DEFAULT_NMS_ETA,
+    DEFAULT_NMS_SCORE_THRESHOLD,
+    DEFAULT_NMS_THRESHOLD,
+    PIL_PNG,
+    Colorspace,
+)
 from ..objects import (
     MRZ,
     DetectionRequest,
@@ -37,11 +45,6 @@ from .mrz import read_passport_file_mrz
 logger = logging.getLogger(__name__)
 
 _DEFAULT_PROVIDERS = ["CUDAExecutionProvider", "CPUExecutionProvider"]
-
-DEFAULT_DETECTION_THRESHOLD = 0.05
-DEFAULT_NMS_THRESHOLD = 0.45
-DEFAULT_NMS_SCORE_THRESHOLD = 0.25
-DEFAULT_NMS_ETA = 0.5
 
 _DEU_PATTERN_0 = re.compile(r"[0-9]D.")
 _DEU_PATTERN_1 = re.compile(r"D<<")
