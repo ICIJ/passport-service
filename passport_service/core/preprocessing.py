@@ -71,8 +71,6 @@ async def preprocess_docs(
         if should_convert_to_pdf(meta.extension)
     ]
     # If all docs are PDFs, let's say the conversion takes about 80% of the time
-    base_pdf_processing_end = 0.8 if to_convert_to_pdf else 0.0
-    pdf_processing_end = base_pdf_processing_end * base_pdf_processing_end
     if to_convert_to_pdf:
         logger.debug("Convert %s docs to PDF...", len(to_convert_to_pdf))
         n_pdf = 0

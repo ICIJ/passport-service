@@ -10,11 +10,8 @@ from collections.abc import (
     Sequence,
 )
 from itertools import islice
-from typing import TypeVar
 
 from aiostream.stream import flatten
-
-T = TypeVar("T")
 
 
 async def run_with_concurrency(
@@ -26,12 +23,12 @@ async def run_with_concurrency(
         yield await res
 
 
-async def _to_async(it: Iterable[T]) -> AsyncIterable[T]:
+async def _to_async[T](it: Iterable[T]) -> AsyncIterable[T]:
     for item in it:
         yield item
 
 
-def iterate_with_concurrency(
+def iterate_with_concurrency[T](
     iterables: Sequence[AsyncIterable[T]], max_concurrency: int
 ) -> AsyncIterator[T]:
     if not iterables:
@@ -40,14 +37,14 @@ def iterate_with_concurrency(
     return streamer
 
 
-async def _run_with_semaphore(
+async def _run_with_semaphore[T](
     aws: Awaitable[T] | asyncio.Future, sem: asyncio.Semaphore
 ) -> T:
     async with sem:
         return await aws
 
 
-def batches(iterable: Iterable[T], batch_size: int) -> Iterator[T]:
+def batches[T](iterable: Iterable[T], batch_size: int) -> Iterator[T]:
     if batch_size < 1:
         raise ValueError("n must be at least one")
     it = iter(iterable)

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import argparse
 import logging
 import sys
@@ -9,8 +7,8 @@ from fastapi import FastAPI, Path
 from gunicorn.app.base import BaseApplication
 from icij_common.logging_utils import setup_loggers
 
-from .config import HttpServiceConfig
 from ..http_.service import create_service
+from .config import HttpServiceConfig
 
 
 class Formatter(argparse.ArgumentDefaultsHelpFormatter):
@@ -38,7 +36,7 @@ class GunicornApp(BaseApplication):
         return self.application
 
     @classmethod
-    def from_config(cls, config: HttpServiceConfig) -> GunicornApp:
+    def from_config(cls, config: HttpServiceConfig) -> "GunicornApp":
         fast_api = create_service(config)
         return cls(fast_api, config)
 

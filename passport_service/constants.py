@@ -6,7 +6,7 @@ DATA_DIR = ROOT_DIR.joinpath("data")
 
 
 @unique
-class Colorspace(str, Enum):
+class Colorspace(str, Enum):  # noqa: UP042
     RGB = "RGB"
     GRAY = "GRAY"
 

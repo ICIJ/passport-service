@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 from asyncio import get_running_loop
 from collections.abc import AsyncGenerator
@@ -69,7 +67,7 @@ class GotenbergClient:
             after=after_log(logger, logging.ERROR),
         ).wraps(self.convert_doc_to_pdf)
 
-    async def __aenter__(self) -> GotenbergClient:
+    async def __aenter__(self) -> "GotenbergClient":
         self._session = ClientSession(loop=get_running_loop())
         await self._exit_stack.enter_async_context(self._session)
         await self._session.__aenter__()

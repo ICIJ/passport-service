@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 def convert_torch_to_dynamic_onnx(model_path: Path, *, output_path: Path) -> None:
-    from ultralytics import YOLO
+    from ultralytics import YOLO  # noqa: PLC0415
 
     model = YOLO(model_path)
     exported = model.export(format="onnx", dynamic=True)
