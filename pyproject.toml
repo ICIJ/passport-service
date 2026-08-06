@@ -48,10 +48,10 @@ inference = [
   "tenacity~=9.0.0",
 ]
 gpu = [
-  "onnxruntime-gpu~=1.18.1",
+  "onnxruntime-gpu~=1.18",
 ]
 cpu = [
-  "onnxruntime~=1.18.1",
+  "onnxruntime~=1.18",
 ]
 preprocessing = [
   "aiohttp~=3.10",
