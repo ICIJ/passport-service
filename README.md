@@ -179,7 +179,9 @@ Zone (MRZ) for each one of these pages.
 To overcome some OpenCV limitations, export the pytorch checkpoint using:
 
 ```python
-model.export(format='onnx', imgsz=640, dynamic=True, opset=12, verbose=True, simplify=True)
+model.export(
+    format="onnx", imgsz=640, dynamic=True, opset=12, verbose=True, simplify=True
+)
 ```
 
 Then, follow the instructions of [this issue](https://github.com/opencv/opencv/issues/25485) to make OpenCV work with
