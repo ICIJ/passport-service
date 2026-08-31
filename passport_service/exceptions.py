@@ -14,7 +14,7 @@ class InvalidDocument(RuntimeError, ABC):
     doc_label: str
 
     def __init__(self, path: Path, reason: str | None = None):
-        msg = f"Invalid {self.doc_label}: {path}."
+        msg = f"Invalid {self.doc_label}: {path}"
         if reason is not None:
             msg = f"{msg}. {reason}"
         super().__init__(msg)
@@ -26,3 +26,9 @@ class InvalidPDF(InvalidDocument):
 
 class InvalidImage(InvalidDocument):
     doc_label: str = "image"
+
+
+class ProcessingTimeout(RuntimeError):
+    def __init__(self, path: Path):
+        msg = f"processing timed out for {path}"
+        super().__init__(msg)

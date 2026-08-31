@@ -8,6 +8,7 @@ from functools import lru_cache, partial
 from pathlib import Path
 
 import pymupdf
+from aiohttp import ClientResponseError
 from icij_common.pydantic_utils import safe_copy
 from PIL import Image, UnidentifiedImageError
 from pymupdf import EmptyFileError, FileDataError
@@ -24,6 +25,7 @@ from ..exceptions import (
     InvalidDocument,
     InvalidImage,
     InvalidPDF,
+    ProcessingTimeout,
     UnsupportedDocExtension,
 )
 from ..objects import DocMetadata, Error, ProcessingReport
@@ -44,7 +46,7 @@ PIL_SUPPORTED_EXTENSIONS = get_pil_supported_extensions()
 SUPPORTED_DOC_EXTS = set([PDF_EXT] + PIL_SUPPORTED_EXTENSIONS)
 SUPPORTED_DOC_EXTS_LIST = sorted(SUPPORTED_DOC_EXTS)
 
-REPORTED_ERRORS = (UnsupportedDocExtension, InvalidDocument)
+REPORTED_ERRORS = (UnsupportedDocExtension, InvalidDocument, ProcessingTimeout)
 
 
 async def preprocess_docs(
@@ -203,7 +205,12 @@ async def _pdf_conversion_wrapper(
     client: GotenbergClient,
 ) -> tuple[int, Path, bytes]:
     doc_bytes = doc.path.read_bytes()
-    converted = await client.convert_doc_to_pdf(doc_bytes, doc.extension)
+    try:
+        converted = await client.convert_doc_to_pdf(doc_bytes, doc.extension)
+    except ClientResponseError as e:
+        if e.status == 429:
+            raise ProcessingTimeout(doc.path) from e
+        raise
     return doc_ix, doc.path, converted
 
 
