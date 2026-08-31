@@ -68,7 +68,7 @@ class GotenbergClient:
         ).wraps(self.convert_doc_to_pdf)
 
     async def __aenter__(self) -> "GotenbergClient":
-        self._session = ClientSession(loop=get_running_loop())
+        self._session = ClientSession(loop=get_running_loop(), raise_for_status=True)
         await self._exit_stack.enter_async_context(self._session)
         await self._session.__aenter__()
         return self
