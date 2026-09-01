@@ -32,3 +32,6 @@ class ProcessingTimeout(RuntimeError):
     def __init__(self, path: Path):
         msg = f"processing timed out for {path}"
         super().__init__(msg)
+
+
+REPORTED_ERRORS = (UnsupportedDocExtension, InvalidDocument, ProcessingTimeout)

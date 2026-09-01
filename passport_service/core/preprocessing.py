@@ -22,7 +22,9 @@ from ..constants import (
     Colorspace,
 )
 from ..exceptions import (
-    InvalidDocument,
+    REPORTED_ERRORS as _REPORTED_ERRORS,
+)
+from ..exceptions import (
     InvalidImage,
     InvalidPDF,
     ProcessingTimeout,
@@ -46,7 +48,7 @@ PIL_SUPPORTED_EXTENSIONS = get_pil_supported_extensions()
 SUPPORTED_DOC_EXTS = set([PDF_EXT] + PIL_SUPPORTED_EXTENSIONS)
 SUPPORTED_DOC_EXTS_LIST = sorted(SUPPORTED_DOC_EXTS)
 
-REPORTED_ERRORS = (UnsupportedDocExtension, InvalidDocument, ProcessingTimeout)
+REPORTED_ERRORS = _REPORTED_ERRORS
 
 
 async def preprocess_docs(
