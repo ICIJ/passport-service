@@ -64,7 +64,7 @@ class GotenbergClient:
             stop=stop_after_attempt(max_retries),
             wait=self._wait,
             reraise=True,
-            after=after_log(logger, logging.ERROR),
+            after=after_log(logger, logging.DEBUG),
         ).wraps(self.convert_doc_to_pdf)
 
     async def __aenter__(self) -> "GotenbergClient":
