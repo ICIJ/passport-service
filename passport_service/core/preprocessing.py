@@ -159,6 +159,7 @@ def process_pdf(
     *,
     output_dir: Path,
     colorspace: Colorspace,
+    force_reprocessing: bool = False,
 ) -> list[Path]:
     if pdf_bytes is None:
         pdf_bytes = pdf_path.read_bytes()
@@ -172,14 +173,10 @@ def process_pdf(
                 page = pdf_doc.load_page(page_i)
                 page_filename = make_page_filename(pdf_path, page_i)
                 page_path = output_dir / page_filename
-                if page_path.exists():
-                    try:
-                        Image.open(page_path, formats=(PIL_PNG,))
-                        logger.debug("valid page image found at: %s", page_path)
-                        pages.append(page_path)
-                        continue
-                    except UnidentifiedImageError:
-                        pass
+                if not force_reprocessing and is_valid_image(page_path):
+                    pages.append(page_path)
+                    logger.debug("valid page image found at: %s", page_path)
+                    continue
                 pix = page.get_pixmap(colorspace=mode)
                 # convert pixmap to pillow image
                 # https://github.com/pymupdf/PyMuPDF/issues/322
@@ -216,7 +213,9 @@ async def _pdf_conversion_wrapper(
     return doc_ix, doc.path, converted
 
 
-def process_image(image_path: Path, *, output_dir: Path) -> list[Path]:
+def process_image(
+    image_path: Path, *, output_dir: Path, force_reprocessing: bool = False
+) -> list[Path]:
     pages = []
     try:
         with image_path.open("rb") as f:
@@ -229,13 +228,20 @@ def process_image(image_path: Path, *, output_dir: Path) -> list[Path]:
                     # Iterate over each frame
                     filename = make_page_filename(image_path, frame_i)
                     page_path = output_dir / filename
+                    if not force_reprocessing and is_valid_image(page_path):
+                        pages.append(page_path)
+                        logger.debug("valid page image found at: %s", page_path)
+                        continue
                     im.seek(frame_i)
                     save_rgb_image(im, page_path)
                     pages.append(page_path)
             else:
                 filename = make_page_filename(image_path, 0)
                 page_path = output_dir / filename
-                save_rgb_image(im, page_path)
+                if force_reprocessing or not is_valid_image(page_path):
+                    save_rgb_image(im, page_path)
+                else:
+                    logger.debug("valid page image found at: %s", page_path)
                 pages.append(page_path)
     except UnidentifiedImageError as e:
         raise InvalidImage(image_path) from e
@@ -253,3 +259,13 @@ def should_convert_to_pdf(ext: str) -> bool:
         return False
     convert = ext in GOTENBERG_SUPPORTED_EXTS
     return convert
+
+
+def is_valid_image(path: Path) -> bool:
+    if not path.exists():
+        return False
+    try:
+        Image.open(path, formats=(PIL_PNG,))
+    except UnidentifiedImageError:
+        return False
+    return True
