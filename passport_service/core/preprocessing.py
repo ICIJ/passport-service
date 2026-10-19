@@ -170,13 +170,13 @@ def process_pdf(
             if pdf_doc.is_encrypted:
                 raise InvalidPDF(pdf_path, reason="PDF is encrypted")
             for page_i in range(pdf_doc.page_count):
-                page = pdf_doc.load_page(page_i)
                 page_filename = make_page_filename(pdf_path, page_i)
                 page_path = output_dir / page_filename
                 if not force_reprocessing and is_valid_image(page_path):
                     pages.append(page_path)
                     logger.debug("valid page image found at: %s", page_path)
                     continue
+                page = pdf_doc.load_page(page_i)
                 pix = page.get_pixmap(colorspace=mode)
                 # convert pixmap to pillow image
                 # https://github.com/pymupdf/PyMuPDF/issues/322
