@@ -6,10 +6,10 @@ authors = [
   { name = "Clément Doumouro", email = "cdoumouro@icij.org" },
 ]
 readme = "README.md"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.12,<3.14"
 dependencies = [
   "aiostream~=0.6",
-  "icij-common~=0.8.3"
+  "icij-common~=0.9"
 ]
 
 [project.urls]
@@ -18,12 +18,6 @@ Repository = "https://github.com/ICIJ/passport-service"
 Issues = "https://github.com/ICIJ/passport-service/issues"
 
 [project.optional-dependencies]
-model-conversion = [
-  "onnx~=1.18.0",
-  "onnxscript~=0.5.0",
-  "torch~=1.13.1",
-  "ultralytics~=8.0.54",
-]
 worker = [
   "icij-worker[amqp,postgres]~=0.20.1",
   "aio-pika==9.4.2",
@@ -60,13 +54,24 @@ preprocessing = [
   "tenacity~=9.0.0",
 ]
 
+[tool.uv]
+override-dependencies = [
+  "icij-common~=0.9.0",
+]
+
 [[tool.uv.index]]
 name = "onnx-cuda12-nightly"
 url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/"
 explicit = true
 
+[[tool.uv.index]]
+name = "torch"
+url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/"
+explicit = true
+
 [tool.uv.sources]
 onnxruntime-gpu = { index = "onnx-cuda12-nightly" }
+
 
 [dependency-groups]
 dev = [

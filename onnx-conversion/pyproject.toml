@@ -1,0 +1,22 @@
+[project]
+name = "passport-model-onnx-conversion"
+version = "0.1.0"
+description = "Convert YOLO model to onnx"
+readme = "README.md"
+requires-python = "==3.11"
+dependencies = []
+[project]
+name = "icij-passport-core"
+dynamic = ["version"]
+description = "Passport detection"
+authors = [
+  { name = "Clément Doumouro", email = "cdoumouro@icij.org" },
+]
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "onnx~=1.18.0",
+  "onnxscript~=0.5.0",
+  "torch~=1.13.1",
+  "ultralytics~=8.0.54",
+]
