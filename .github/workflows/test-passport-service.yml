@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-passport-service:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       PYTHON_VERSION: 3.12
       ASTRAL_VERSION: 0.11.6
