@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import logging
 import os
@@ -11,7 +12,7 @@ import pymupdf
 from aiohttp import ClientResponseError
 from icij_common.pydantic_utils import safe_copy
 from PIL import Image, UnidentifiedImageError
-from pymupdf import EmptyFileError, FileDataError
+from pymupdf import Colorspace, Document, EmptyFileError, FileDataError
 
 from ..constants import (
     COLOR_LUT,
@@ -183,6 +184,40 @@ def process_pdf(
                 img = Image.frombytes(mode, (pix.w, pix.h), pix.samples)
                 img.save(page_path, format=PIL_PNG)
                 pages.append(page_path)
+    except (EmptyFileError, FileDataError) as e:
+        raise InvalidPDF(pdf_path) from e
+    return pages
+
+
+async def async_process_pdf(
+    pdf_doc: Document,
+    pdf_path: Path,
+    *,
+    output_dir: Path,
+    colorspace: Colorspace,
+    force_reprocessing: bool = False,
+) -> list[Path]:
+    mode = COLOR_LUT[colorspace]
+    pages = []
+    try:
+        if pdf_doc.is_encrypted:
+            raise InvalidPDF(pdf_doc.path, reason="PDF is encrypted")
+        for page_i in range(pdf_doc.page_count):
+            page_filename = make_page_filename(pdf_path, page_i)
+            page_path = output_dir / page_filename
+            if not force_reprocessing and is_valid_image(page_path):
+                pages.append(page_path)
+                logger.debug("valid page image found at: %s", page_path)
+                continue
+            page = await asyncio.to_thread(pdf_doc.load_page, page_i)
+            pix = page.get_pixmap(colorspace=mode)
+            # convert pixmap to pillow image
+            # https://github.com/pymupdf/PyMuPDF/issues/322
+            img = await asyncio.to_thread(
+                Image.frombytes, mode, (pix.w, pix.h), pix.samples
+            )
+            await asyncio.to_thread(img.save, page_path, format=PIL_PNG)
+            pages.append(page_path)
     except (EmptyFileError, FileDataError) as e:
         raise InvalidPDF(pdf_path) from e
     return pages
