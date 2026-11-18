@@ -194,13 +194,19 @@ async def async_process_pdf(
     output_dir: Path,
     colorspace: Colorspace,
     force_reprocessing: bool = False,
+    skip: set[int] | None = None,
 ) -> list[Path]:
     mode = COLOR_LUT[colorspace]
     pages = []
+    if skip is None:
+        skip = set()
     try:
         if pdf_doc.is_encrypted:
             raise InvalidPDF(pdf_doc.path, reason="PDF is encrypted")
         for page_i in range(pdf_doc.page_count):
+            if page_i in skip:
+                logger.debug("skipping page %s as requested", page_i)
+                continue
             page_filename = make_page_filename(pdf_path, page_i)
             page_path = output_dir / page_filename
             if not force_reprocessing and is_valid_image(page_path):
