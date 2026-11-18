@@ -8,6 +8,7 @@ except ModuleNotFoundError:
     GotenbergClient = None
 try:
     from .preprocessing import (
+        async_process_pdf,
         get_pil_supported_extensions,
         preprocess_docs,
         process_image,
@@ -30,6 +31,7 @@ __all__ = [
     "GotenbergClient",
     "get_pil_supported_extensions",
     "preprocess_docs",
+    "async_process_pdf",
     "process_image",
     "process_pdf",
     "should_convert_to_pdf",
