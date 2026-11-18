@@ -14,17 +14,8 @@ from icij_common.pydantic_utils import safe_copy
 from PIL import Image, UnidentifiedImageError
 from pymupdf import Colorspace, Document, EmptyFileError, FileDataError
 
-from ..constants import (
-    COLOR_LUT,
-    GOTENBERG_SUPPORTED_EXTS,
-    PDF_EXT,
-    PIL_PNG,
-    PNG_EXT,
-    Colorspace,
-)
-from ..exceptions import (
-    REPORTED_ERRORS as _REPORTED_ERRORS,
-)
+from ..constants import COLOR_LUT, GOTENBERG_SUPPORTED_EXTS, PDF_EXT, PIL_PNG, PNG_EXT
+from ..exceptions import REPORTED_ERRORS as _REPORTED_ERRORS
 from ..exceptions import (
     InvalidImage,
     InvalidPDF,
