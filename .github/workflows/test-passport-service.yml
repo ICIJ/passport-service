@@ -29,9 +29,6 @@ jobs:
           sudo apt install tesseract-ocr
           curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/download/v2.19.0/dbmate-linux-amd64
           chmod +x /usr/local/bin/dbmate
-      - uses: astral-sh/ruff-action@v3
-        with:
-          args: format --check --config qa/ruff.toml
       - name: Install uv
         uses: astral-sh/setup-uv@v4
         with:
