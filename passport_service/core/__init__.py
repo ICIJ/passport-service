@@ -16,6 +16,7 @@ try:
         should_convert_to_pdf,
     )
 except ModuleNotFoundError:
+    async_process_pdf = None
     get_pil_supported_extensions = None
     preprocess_docs = None
     process_image = None
